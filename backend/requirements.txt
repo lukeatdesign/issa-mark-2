@@ -3,3 +3,4 @@ anthropic
 python-dotenv
 requests
 flask-cors
+gunicorn
