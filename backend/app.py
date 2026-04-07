@@ -12,7 +12,10 @@ load_dotenv(override=True)
 
 app = Flask(__name__)
 from flask_cors import CORS
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:3000",
+    "https://issa-mark-2.vercel.app"
+])
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
