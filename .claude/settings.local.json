@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(wc -l /c/issa-compass-mark-2/backend/*.py)",
+      "Bash(wc -l /c/issa-compass-mark-2/frontend/src/**/*.tsx)",
+      "Bash(xargs wc:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''scripts:'''', list\\(d.get\\(''''scripts'''',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(node -e \"const d=require\\(''/c/issa-compass-mark-2/frontend/package.json''\\); console.log\\(''scripts:'', JSON.stringify\\(d.scripts\\)\\)\")",
+      "Bash(node -e \"const d=require\\(''C:/issa-compass-mark-2/frontend/package.json''\\); console.log\\(JSON.stringify\\(d.scripts, null, 2\\)\\)\")",
+      "Bash(python -c \"from dotenv import load_dotenv; load_dotenv\\(\\); import os; key=os.environ.get\\(''SUPABASE_SERVICE_ROLE_KEY'',''''\\); print\\(''length:'', len\\(key\\)\\); print\\(''starts with:'', key[:10] if key else ''EMPTY''\\); print\\(''url:'', os.environ.get\\(''SUPABASE_URL'',''EMPTY''\\)\\)\")",
+      "Bash(pip show:*)",
+      "Bash(pip index:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c \"from dotenv import load_dotenv; load_dotenv\\(\\); import os; from supabase import create_client; sb = create_client\\(os.environ[''SUPABASE_URL''], os.environ[''SUPABASE_SERVICE_ROLE_KEY'']\\); r = sb.table\\(''paths''\\).select\\(''id''\\).limit\\(1\\).execute\\(\\); print\\(''OK:'', r.data\\)\")",
+      "Bash(python -c \"from dotenv import load_dotenv; load_dotenv\\(\\); import os; from supabase import create_client; sb = create_client\\(os.environ[''''SUPABASE_URL''''], os.environ[''''SUPABASE_SERVICE_ROLE_KEY'''']\\); r = sb.table\\(''''paths''''\\).select\\(''''id''''\\).limit\\(1\\).execute\\(\\); print\\(''''OK:'''', r.data\\)\")",
+      "Bash(gh api:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(curl -s -X POST http://localhost:5000/generate-reply -H \"Content-Type: application/json\" -d \"{\"\"clientSequence\"\": \"\"Hi, I just got a job offer from a company in Bangkok!! They said they can help with visa but I''m not sure what I need to do from my side. I''m from Cambodia.\"\", \"\"chatHistory\"\": []}\")",
+      "Bash(curl -s:*)",
+      "Bash(node -e \"const p=require\\(''C:/issa-compass-mark-2/frontend/package.json''\\); console.log\\(JSON.stringify\\({deps: p.dependencies, devDeps: p.devDependencies}, null, 2\\)\\)\")",
+      "Bash(npm install:*)",
+      "Bash(Out-Null)",
+      "Bash(python -c \":*)"
+    ]
+  }
+}
