@@ -21,6 +21,8 @@ export type CurrentVisa = "none" | "tourist" | "non_b" | "other";
 export type Urgency = "exploring" | "planning" | "urgent";
 
 export interface QuizAnswers {
+  /** User's first name (optional — skippable). */
+  name?: string;
   intent?: Intent;
   work_type?: WorkType;
   nationality?: string;

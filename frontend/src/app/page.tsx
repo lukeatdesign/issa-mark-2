@@ -29,12 +29,20 @@ export default function LandingPage() {
         <span className="font-display font-bold text-lg text-brand-900">
           Issa Compass
         </span>
-        <Link
-          href="/login"
-          className="text-sm font-medium text-brand-600 hover:underline"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/login?tab=signup"
+            className="text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors"
+          >
+            Sign up
+          </Link>
+          <Link
+            href="/login"
+            className="text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg px-4 py-2 transition-colors"
+          >
+            Sign in
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}

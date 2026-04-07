@@ -401,6 +401,7 @@ function positiveSubtitle(tasksDone: number, total: number): string {
 export default function OverviewPage() {
   const [roadmap, setRoadmap] = useState<RoadmapData | null>(null);
   const [docReady, setDocReady] = useState<Record<number, boolean>>({});
+  const [quizName, setQuizName] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -408,6 +409,15 @@ export default function OverviewPage() {
       const raw = localStorage.getItem("issa_roadmap");
       if (raw) setRoadmap(JSON.parse(raw));
     } catch { /* corrupted — treat as empty */ }
+
+    try {
+      const raw = localStorage.getItem("issa_onboarding");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const name = parsed?.state?.answers?.name;
+        if (name) setQuizName(name);
+      }
+    } catch { /* ignore */ }
 
     try {
       const raw = localStorage.getItem("issa_documents_checklist");
@@ -436,7 +446,7 @@ export default function OverviewPage() {
     (t) => !t.done && (t.status === "available" || t.status === "in_progress")
   );
   const nextTasks = availableTasks.slice(0, 5);
-  const userName = roadmap.userName ?? "there";
+  const userName = roadmap.userName || quizName || "there";
   const docsUploaded = DOC_IDS.filter((id) => docReady[id]).length;
 
   return (

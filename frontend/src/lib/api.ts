@@ -33,6 +33,7 @@ export type RoadmapData = {
 };
 
 export type QuizAnswers = {
+  name?: string;
   intent?: string;
   work_type?: string;
   nationality?: string;

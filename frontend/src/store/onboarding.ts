@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { QuizAnswers } from "@/types";
 
+// name is optional — users can skip it
+// All other quiz keys are considered "touched" once the user has gone through the step
+// (value may be empty string for skipped steps)
 const REQUIRED_KEYS: (keyof QuizAnswers)[] = [
   "intent",
   "work_type",
@@ -12,7 +15,8 @@ const REQUIRED_KEYS: (keyof QuizAnswers)[] = [
 ];
 
 export function isOnboardingComplete(answers: QuizAnswers): boolean {
-  return REQUIRED_KEYS.every((k) => !!answers[k]);
+  // A step is complete if the key exists in answers (even empty string = skipped)
+  return REQUIRED_KEYS.every((k) => k in answers);
 }
 
 export interface OnboardingState {
@@ -30,7 +34,7 @@ export const useOnboardingStore = create<OnboardingState>()(
     (set) => ({
       currentStep: 0,
       answers: {},
-      totalSteps: 6,
+      totalSteps: 7,
 
       setAnswer: (key, value) =>
         set((state) => ({ answers: { ...state.answers, [key]: value } })),
@@ -45,6 +49,10 @@ export const useOnboardingStore = create<OnboardingState>()(
 
       reset: () => set({ currentStep: 0, answers: {} }),
     }),
-    { name: "issa_onboarding" }
+    {
+      name: "issa_onboarding",
+      // totalSteps must not be persisted — it changes when questions are added/removed
+      partialize: (state) => ({ currentStep: state.currentStep, answers: state.answers }),
+    }
   )
 );

@@ -28,6 +28,15 @@ const config: Config = {
         display: ["var(--font-lora)", "Georgia", "serif"],
         body:    ["var(--font-dm-sans)", "system-ui", "sans-serif"],
       },
+      keyframes: {
+        "slide-up": {
+          "0%":   { opacity: "0", transform: "translate(-50%, 16px)" },
+          "100%": { opacity: "1", transform: "translate(-50%, 0)" },
+        },
+      },
+      animation: {
+        "slide-up": "slide-up 0.2s ease-out both",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],

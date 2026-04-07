@@ -231,6 +231,8 @@ def build_quiz_context(quiz_answers: dict) -> str:
     if not quiz_answers:
         return ""
     lines = []
+    if quiz_answers.get('name'):
+        lines.append(f"- User's name: {quiz_answers['name']}")
     if quiz_answers.get('nationality'):
         lines.append(f"- Nationality: {quiz_answers['nationality']}")
     if quiz_answers.get('intent'):
@@ -346,6 +348,9 @@ Return ONLY valid JSON, no markdown, no explanation:
 
         clean = raw.replace('```json', '').replace('```', '').strip()
         roadmap = json.loads(clean)
+        # Override userName with the quiz-provided name if available
+        if quiz_answers.get('name'):
+            roadmap['userName'] = quiz_answers['name']
         return jsonify(roadmap)
 
     except Exception as e:
