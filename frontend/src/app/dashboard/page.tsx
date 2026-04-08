@@ -145,11 +145,12 @@ function NextActions({
       ) : (
         <>
           <div className="space-y-2">
-            {nextTasks.map((task) => (
+            {nextTasks.map((task, i) => (
               <Link
                 key={task.id}
                 href={taskHref(task)}
-                className={`
+                style={{ animationDelay: `${i * 70}ms` }}
+                className={`animate-fade-in-up opacity-0 [animation-fill-mode:both]
                   group flex items-center justify-between gap-3
                   bg-white rounded-xl border border-gray-100 shadow-sm p-4
                   hover:shadow-md hover:border-emerald-200 hover:-translate-y-0.5
@@ -453,7 +454,7 @@ export default function OverviewPage() {
     <div className="max-w-2xl mx-auto py-10 px-6 flex flex-col gap-6">
 
       {/* Greeting header */}
-      <div>
+      <div className="animate-fade-in-up">
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
           {greeting()}, {userName} 👋
         </h1>

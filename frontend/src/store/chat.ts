@@ -1,17 +1,32 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ChatMessage } from "@/types";
+import type { ChatMessage, ChatActiveTask } from "@/types";
 
 type ChatMode = "companion" | "consultant";
 
 export const GENERAL_THREAD_ID = "general";
 
+export interface ThreadMeta {
+  name: string;
+  pinned: boolean;
+  createdAt: string;
+  task?: ChatActiveTask;
+}
+
+const DEFAULT_GENERAL_META: ThreadMeta = {
+  name: "General",
+  pinned: false,
+  createdAt: new Date().toISOString(),
+};
+
 interface ChatState {
   activeThreadId: string;
   threads: Record<string, ChatMessage[]>;
+  threadMeta: Record<string, ThreadMeta>;
   conversationId: string | null;
   mode: ChatMode;
   loading: boolean;
+
   setConversationId: (id: string) => void;
   setActiveThreadId: (id: string) => void;
   addMessage: (msg: ChatMessage) => void;
@@ -20,6 +35,8 @@ interface ChatState {
   appendCorrectionAttempt: (messageId: string, correction: string) => void;
   setMode: (mode: ChatMode) => void;
   setLoading: (loading: boolean) => void;
+  setThreadMeta: (threadId: string, meta: Partial<ThreadMeta>) => void;
+  toggleThreadPin: (threadId: string) => void;
   reset: () => void;
 }
 
@@ -45,6 +62,7 @@ export const useChatStore = create<ChatState>()(
     (set) => ({
       activeThreadId: GENERAL_THREAD_ID,
       threads: { [GENERAL_THREAD_ID]: [] },
+      threadMeta: { [GENERAL_THREAD_ID]: DEFAULT_GENERAL_META },
       conversationId: null,
       mode: "companion",
       loading: false,
@@ -64,9 +82,7 @@ export const useChatStore = create<ChatState>()(
         set((state) => {
           const id = state.activeThreadId;
           const cur = state.threads[id] ?? [];
-          return {
-            threads: { ...state.threads, [id]: [...cur, msg] },
-          };
+          return { threads: { ...state.threads, [id]: [...cur, msg] } };
         }),
 
       addMessageToThread: (threadId, msg) =>
@@ -92,10 +108,7 @@ export const useChatStore = create<ChatState>()(
           const nextThreads = mapMessageInThreads(
             state.threads,
             messageId,
-            (m) => ({
-              ...m,
-              correction_attempt: correction,
-            })
+            (m) => ({ ...m, correction_attempt: correction })
           );
           return nextThreads ? { threads: nextThreads } : state;
         }),
@@ -103,10 +116,38 @@ export const useChatStore = create<ChatState>()(
       setMode: (mode) => set({ mode }),
       setLoading: (loading) => set({ loading }),
 
+      setThreadMeta: (threadId, meta) =>
+        set((state) => ({
+          threadMeta: {
+            ...state.threadMeta,
+            [threadId]: {
+              ...(state.threadMeta[threadId] ?? {
+                name: "Thread",
+                pinned: false,
+                createdAt: new Date().toISOString(),
+              }),
+              ...meta,
+            },
+          },
+        })),
+
+      toggleThreadPin: (threadId) =>
+        set((state) => {
+          const existing = state.threadMeta[threadId];
+          if (!existing) return state;
+          return {
+            threadMeta: {
+              ...state.threadMeta,
+              [threadId]: { ...existing, pinned: !existing.pinned },
+            },
+          };
+        }),
+
       reset: () =>
         set({
           activeThreadId: GENERAL_THREAD_ID,
           threads: { [GENERAL_THREAD_ID]: [] },
+          threadMeta: { [GENERAL_THREAD_ID]: DEFAULT_GENERAL_META },
           conversationId: null,
           loading: false,
         }),
@@ -116,6 +157,7 @@ export const useChatStore = create<ChatState>()(
       partialize: (s) => ({
         threads: s.threads,
         activeThreadId: s.activeThreadId,
+        threadMeta: s.threadMeta,
       }),
     }
   )

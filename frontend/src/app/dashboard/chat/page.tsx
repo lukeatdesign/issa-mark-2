@@ -16,7 +16,9 @@ import type { ChatMessage } from "@/types";
 import { AcademicCapIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import TaskPanel from "@/components/chat/TaskPanel";
 import RoadmapContextPanel from "@/components/chat/RoadmapContextPanel";
+import ChatThreadSidebar from "@/components/chat/ChatThreadSidebar";
 import { derivePath, PATH_LABELS } from "@/lib/quiz-logic";
+import { deriveGeneralSuggestions, deriveTaskSuggestions } from "@/lib/suggestions";
 import { useChatTaskPanelStore } from "@/store/chatTaskPanel";
 import type { ChatActiveTask } from "@/types";
 
@@ -44,6 +46,7 @@ export default function ChatPage() {
   const setTaskFromRoadmap = useChatTaskPanelStore((s) => s.setTaskFromRoadmap);
   const setGeneralHelp = useChatTaskPanelStore((s) => s.setGeneralHelp);
   const setPanelExpanded = useChatTaskPanelStore((s) => s.setPanelExpanded);
+  const setThreadMeta    = useChatStore((s) => s.setThreadMeta);
 
   // ── Auto-welcome on first visit after quiz (wait for persisted onboarding) ─
   const welcomeFired = useRef(false);
@@ -220,6 +223,49 @@ export default function ChatPage() {
   const minReplies = quizComplete ? 3 : 5;
   const chatReady  = assistantCount >= minReplies;
 
+  // ── Register thread metadata whenever a task thread becomes active ────────
+  useEffect(() => {
+    if (helpMode !== "task" || !activeTask) return;
+    if (resolvedThreadId === GENERAL_THREAD_ID) return;
+    setThreadMeta(resolvedThreadId, {
+      name: activeTask.task,
+      task: activeTask,
+      createdAt: new Date().toISOString(),
+    });
+  }, [resolvedThreadId, helpMode, activeTask, setThreadMeta]);
+
+  // ── Thread selection from sidebar ─────────────────────────────────────────
+  const handleSelectThread = (threadId: string) => {
+    if (threadId === GENERAL_THREAD_ID) {
+      setGeneralHelp();
+      return;
+    }
+    const meta = useChatStore.getState().threadMeta[threadId];
+    if (meta?.task) setTaskPayload(meta.task);
+  };
+
+  // ── Inject suggested chips into the last assistant message ───────────────
+  const displayMessages = useMemo(() => {
+    if (loading) return messages;
+
+    let lastAssistantIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") { lastAssistantIdx = i; break; }
+    }
+    if (lastAssistantIdx === -1) return messages;
+
+    const suggestions =
+      helpMode === "task" && activeTask
+        ? deriveTaskSuggestions(messages, activeTask)
+        : deriveGeneralSuggestions(messages, quizAnswers);
+
+    if (!suggestions.length) return messages;
+
+    return messages.map((m, i) =>
+      i === lastAssistantIdx ? { ...m, suggested_followups: suggestions } : m
+    );
+  }, [messages, loading, helpMode, activeTask, quizAnswers]);
+
   const buildHistory = () =>
     generalMessages
       .filter((m) => !m.id.startsWith("temp-") && !m.id.startsWith("err-"))
@@ -343,6 +389,9 @@ export default function ChatPage() {
   return (
     <div className="flex h-screen min-h-0">
 
+      {/* ── Thread navigator ────────────────────────────────────────────────── */}
+      <ChatThreadSidebar onSelectThread={handleSelectThread} />
+
       {/* ── Chat column ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0 min-h-0">
         {/* Header */}
@@ -366,7 +415,7 @@ export default function ChatPage() {
         </div>
 
         <ChatWindow
-          messages={messages}
+          messages={displayMessages}
           loading={loading}
           onChipSelect={(text) => sendMessage(text)}
         />

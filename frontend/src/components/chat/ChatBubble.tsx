@@ -16,13 +16,25 @@ export default function ChatBubble({ message, onChipSelect }: ChatBubbleProps) {
       <div className={`max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col`}>
         {/* Bubble */}
         <div
-          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed animate-fade-in-up ${
             isUser
               ? "bg-brand-600 text-white rounded-br-sm whitespace-pre-wrap"
               : "bg-white border border-gray-100 text-gray-800 rounded-bl-sm shadow-sm prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-strong:font-semibold prose-strong:text-gray-900"
           }`}
         >
-          {isUser ? message.content : <ReactMarkdown>{message.content}</ReactMarkdown>}
+          {isUser ? (
+            message.content
+          ) : (
+            <ReactMarkdown
+              components={{
+                ol: ({ children }) => (
+                  <ol className="list-none pl-0 my-1">{children}</ol>
+                ),
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
 
         {/* Correction attempt */}

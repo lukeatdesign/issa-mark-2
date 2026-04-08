@@ -13,7 +13,8 @@ export default function SuggestedChips({ suggestions, onSelect }: SuggestedChips
         <button
           key={i}
           onClick={() => onSelect(s)}
-          className="text-xs px-3 py-1.5 rounded-full border border-brand-200 text-brand-700 bg-brand-50 hover:bg-brand-100 transition-colors"
+          style={{ animationDelay: `${i * 60}ms` }}
+          className="text-xs px-3 py-1.5 rounded-full border border-brand-200 text-brand-700 bg-brand-50 hover:bg-brand-100 active:scale-95 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:both]"
         >
           {s}
         </button>

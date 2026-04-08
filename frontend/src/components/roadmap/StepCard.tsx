@@ -74,7 +74,7 @@ export default function StepCard({ step, index, onStatusChange }: StepCardProps)
 
       {/* Expanded content */}
       {expanded && (
-        <div className="px-5 pb-5 space-y-4 border-t border-gray-100">
+        <div className="px-5 pb-5 space-y-4 border-t border-gray-100 animate-fade-in-up">
           <p className="text-sm text-gray-700 mt-4 leading-relaxed">{step.description}</p>
 
           {step.why_it_matters && (
@@ -135,7 +135,7 @@ export default function StepCard({ step, index, onStatusChange }: StepCardProps)
           {action.next && (
             <button
               onClick={() => onStatusChange(step.id, action.next!)}
-              className="mt-2 text-sm font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
+              className="mt-2 text-sm font-semibold text-brand-600 hover:text-brand-700 active:scale-95 transition-transform flex items-center gap-1"
             >
               {action.label} →
             </button>

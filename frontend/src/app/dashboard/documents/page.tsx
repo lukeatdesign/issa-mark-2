@@ -242,12 +242,13 @@ export default function DocumentsPage() {
 
       {/* Document cards */}
       <div className="space-y-3 mb-8">
-        {DOCS.map((doc) => {
+        {DOCS.map((doc, i) => {
           const isUploaded = !!uploaded[doc.id];
           return (
             <div
               key={doc.id}
-              className={`flex items-center justify-between gap-4 bg-white rounded-xl border px-4 py-4 transition-all ${
+              style={{ animationDelay: `${i * 70}ms` }}
+              className={`animate-fade-in-up opacity-0 [animation-fill-mode:both] flex items-center justify-between gap-4 bg-white rounded-xl border px-4 py-4 transition-all ${
                 isUploaded
                   ? "border-l-4 border-teal-400 border-t border-r border-b border-gray-100"
                   : "border-gray-100"
@@ -269,7 +270,7 @@ export default function DocumentsPage() {
                 <button
                   type="button"
                   onClick={() => toggle(doc.id)}
-                  className="flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 text-xs font-medium rounded-full border border-teal-200 shrink-0 hover:bg-teal-100 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 text-xs font-medium rounded-full border border-teal-200 shrink-0 hover:bg-teal-100 active:scale-95 transition-all"
                 >
                   Ready ✓
                 </button>

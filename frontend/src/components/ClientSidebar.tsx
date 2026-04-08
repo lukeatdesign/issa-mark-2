@@ -9,6 +9,13 @@ import {
   MapPinIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
+import {
+  HomeIcon as HomeIconSolid,
+  ChatBubbleLeftRightIcon as ChatIconSolid,
+  MapIcon as MapIconSolid,
+  DocumentTextIcon as DocumentIconSolid,
+  MapPinIcon as MapPinIconSolid,
+} from "@heroicons/react/24/solid";
 import type { ComponentType, SVGProps } from "react";
 import { useAuthStore } from "@/store/auth";
 import api from "@/lib/api";
@@ -17,14 +24,15 @@ interface NavItem {
   href: string;
   label: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  IconSolid: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Overview", Icon: HomeIcon },
-  { href: "/dashboard/chat", label: "Chat", Icon: ChatBubbleLeftRightIcon },
-  { href: "/dashboard/roadmap", label: "My Roadmap", Icon: MapIcon },
-  { href: "/dashboard/documents", label: "Documents", Icon: DocumentTextIcon },
-  { href: "/dashboard/status", label: "Status", Icon: MapPinIcon },
+  { href: "/dashboard",           label: "Overview",   Icon: HomeIcon,                IconSolid: HomeIconSolid     },
+  { href: "/dashboard/chat",      label: "Chat",       Icon: ChatBubbleLeftRightIcon, IconSolid: ChatIconSolid     },
+  { href: "/dashboard/roadmap",   label: "My Roadmap", Icon: MapIcon,                 IconSolid: MapIconSolid      },
+  { href: "/dashboard/documents", label: "Documents",  Icon: DocumentTextIcon,        IconSolid: DocumentIconSolid },
+  { href: "/dashboard/status",    label: "App Status",  Icon: MapPinIcon,              IconSolid: MapPinIconSolid   },
 ];
 
 export default function ClientSidebar() {
@@ -55,18 +63,19 @@ export default function ClientSidebar() {
           const active =
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const NavIcon = active ? item.IconSolid : item.Icon;
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
                 active
-                  ? "bg-brand-50 text-brand-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-brand-50 text-brand-700 border-brand-200"
+                  : "border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              <item.Icon className="w-4 h-4 shrink-0" />
+              <NavIcon className="w-4 h-4 shrink-0" />
               {item.label}
             </Link>
           );

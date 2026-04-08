@@ -208,6 +208,7 @@ export default function ConsultantDrawer({ open, onClose, messages }: Props) {
         res.data?.updated_prompt ??
         "";
 
+      onClose(); // dismiss drawer before mounting modal to avoid stacking context conflicts
       setAfterPrompt(newPrompt);
       setConsultantReply("");
       if (textareaRef.current) textareaRef.current.value = "";

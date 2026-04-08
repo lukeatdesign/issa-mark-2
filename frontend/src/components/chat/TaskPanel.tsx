@@ -294,7 +294,7 @@ export default function TaskPanel({
       <div className="w-72 border-l border-gray-100 bg-white flex flex-col flex-shrink-0 h-full min-h-0 overflow-hidden">
         {panelChrome}
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
-          <div className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center mb-4">
+          <div className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center mb-4 animate-scale-pop">
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
@@ -384,9 +384,9 @@ export default function TaskPanel({
                         className="flex items-start gap-2.5 w-full text-left group"
                       >
                         <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center mt-0.5 flex-shrink-0 transition-colors ${
+                          className={`w-4 h-4 rounded border flex items-center justify-center mt-0.5 flex-shrink-0 transition-all active:scale-90 ${
                             subtaskChecked[i]
-                              ? "bg-teal-500 border-teal-500"
+                              ? "bg-teal-500 border-teal-500 animate-scale-pop"
                               : "border-gray-300 group-hover:border-teal-400 bg-white"
                           }`}
                         >
@@ -405,7 +405,7 @@ export default function TaskPanel({
                         </span>
                       </button>
                       {showSubtaskPrompt ? (
-                        <div className="ml-7 pl-0.5 rounded-lg border border-amber-100 bg-amber-50/90 px-2.5 py-2">
+                        <div className="ml-7 pl-0.5 rounded-lg border border-amber-100 bg-amber-50/90 px-2.5 py-2 animate-fade-in-up">
                           <p className="text-[11px] text-amber-900 leading-snug mb-1.5">
                             From what you shared, it sounds like you may have done this step. Mark it
                             complete?
@@ -421,7 +421,7 @@ export default function TaskPanel({
                                   clampSubtaskProgress({ ...prev, [i]: true }, task?.subtasks.length ?? 0)
                                 );
                               }}
-                              className="flex-1 text-[11px] font-medium bg-amber-600 hover:bg-amber-700 text-white rounded-md py-1 px-2 transition-colors"
+                              className="flex-1 text-[11px] font-medium bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-md py-1 px-2 transition-all"
                             >
                               Yes, done
                             </button>
@@ -459,7 +459,7 @@ export default function TaskPanel({
           )}
 
           {showCompletionPrompt && (
-            <div className="mx-4 mt-3 flex-shrink-0 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+            <div className="mx-4 mt-3 flex-shrink-0 bg-emerald-50 border border-emerald-200 rounded-xl p-3 animate-fade-in-up">
               <p className="text-xs font-medium text-emerald-800 mb-2">
                 {aiSuggestsDone && !allSubtasksDone
                   ? "Compass thinks you may have finished this."
@@ -469,7 +469,7 @@ export default function TaskPanel({
                 <button
                   type="button"
                   onClick={handleMarkDone}
-                  className="flex-1 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg py-1.5 transition-colors"
+                  className="flex-1 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg py-1.5 transition-all"
                 >
                   Mark as done ✓
                 </button>
@@ -497,7 +497,7 @@ export default function TaskPanel({
               <button
                 type="button"
                 onClick={handleMarkDone}
-                className="w-full text-xs font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-100 rounded-lg py-2.5 transition-colors"
+                className="w-full text-xs font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 active:scale-95 border border-teal-100 rounded-lg py-2.5 transition-all"
               >
                 Mark as done ✓
               </button>

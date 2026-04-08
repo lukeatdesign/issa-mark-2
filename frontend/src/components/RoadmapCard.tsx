@@ -218,9 +218,9 @@ function TaskCard({
           <button
             type="button"
             onClick={handleCheckboxClick}
-            className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
+            className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all active:scale-90 ${
               checked
-                ? "bg-brand-600 border-brand-600"
+                ? "bg-brand-600 border-brand-600 animate-scale-pop"
                 : "border-gray-300 hover:border-brand-400"
             }`}
           >
@@ -277,11 +277,13 @@ function TaskCard({
 
         {/* Inline confirmation */}
         {confirming && (
+          <div className="animate-fade-in-up">
           <ConfirmInline
             isDocsTask={isDocsTask}
             onConfirm={handleConfirm}
             onDismiss={handleDismiss}
           />
+          </div>
         )}
 
         {/* Expanded section */}
@@ -295,9 +297,9 @@ function TaskCard({
                     <button
                       type="button"
                       onClick={() => toggleSubtask(i)}
-                      className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                      className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all active:scale-90 ${
                         subtaskChecked[i]
-                          ? "bg-brand-600 border-brand-600"
+                          ? "bg-brand-600 border-brand-600 animate-scale-pop"
                           : "border-gray-300 hover:border-brand-400"
                       }`}
                     >
@@ -341,7 +343,7 @@ function TaskCard({
                 <button
                   type="button"
                   onClick={() => router.push("/dashboard/documents")}
-                  className="text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg px-4 py-2 shadow-sm transition-colors"
+                  className="text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 active:scale-95 rounded-lg px-4 py-2 shadow-sm transition-all"
                 >
                   Upload documents
                 </button>
@@ -349,7 +351,7 @@ function TaskCard({
               <button
                 type="button"
                 onClick={onHelpClick}
-                className="text-sm font-medium text-teal-800 bg-white border border-teal-300 rounded-lg px-4 py-2 hover:bg-teal-50 transition-colors"
+                className="text-sm font-medium text-teal-800 bg-white border border-teal-300 rounded-lg px-4 py-2 hover:bg-teal-50 active:scale-95 transition-all"
               >
                 {task.status === "blocked" ? "Understand this step →" : "Help me do this →"}
               </button>
@@ -541,15 +543,20 @@ export default function RoadmapCard({ data }: { data: RoadmapData }) {
             <span className="text-xs text-gray-400">— your most relevant next actions</span>
           </div>
           <div className="space-y-2">
-            {focusTasks.map(({ task, section }) => (
-              <TaskCard
+            {focusTasks.map(({ task, section }, i) => (
+              <div
                 key={`focus-${task.id}`}
-                task={task}
-                taskSection={section}
-                checked={!!(section === "user" ? userChecked[task.id] : employerChecked[task.id])}
-                onToggle={() => (section === "user" ? toggleUser(task.id) : toggleEmployer(task.id))}
-                onHelpClick={() => handleHelp(task, section)}
-              />
+                className="animate-fade-in-up opacity-0 [animation-fill-mode:both]"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <TaskCard
+                  task={task}
+                  taskSection={section}
+                  checked={!!(section === "user" ? userChecked[task.id] : employerChecked[task.id])}
+                  onToggle={() => (section === "user" ? toggleUser(task.id) : toggleEmployer(task.id))}
+                  onHelpClick={() => handleHelp(task, section)}
+                />
+              </div>
             ))}
           </div>
         </div>

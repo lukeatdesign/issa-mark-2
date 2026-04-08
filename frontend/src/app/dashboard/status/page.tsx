@@ -52,13 +52,36 @@ const STAGES: Stage[] = [
   },
 ];
 
-function StageIcon({ status }: { status: StageStatus }) {
+const SPARKLE_CONFIGS = [
+  { style: { top: "-10px", left: "50%", transform: "translateX(-50%)" }, delay: "0ms" },
+  { style: { top: "-3px", right: "-10px" },                              delay: "50ms" },
+  { style: { bottom: "-3px", right: "-10px" },                           delay: "110ms" },
+  { style: { bottom: "-10px", left: "50%", transform: "translateX(-50%)" }, delay: "70ms" },
+  { style: { bottom: "-3px", left: "-10px" },                            delay: "30ms" },
+  { style: { top: "-3px", left: "-10px" },                               delay: "90ms" },
+];
+
+function StageIcon({ status, celebrating }: { status: StageStatus; celebrating?: boolean }) {
   if (status === "completed") {
     return (
-      <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-        </svg>
+      <div className="relative shrink-0 w-7 h-7">
+        <div
+          className={`w-7 h-7 rounded-full bg-green-500 flex items-center justify-center ${
+            celebrating ? "animate-celebrate-pop" : ""
+          }`}
+        >
+          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        {celebrating &&
+          SPARKLE_CONFIGS.map((cfg, k) => (
+            <span
+              key={k}
+              className="absolute w-1.5 h-1.5 rounded-full bg-green-400 animate-sparkle-fade pointer-events-none"
+              style={{ ...cfg.style, animationDelay: cfg.delay }}
+            />
+          ))}
       </div>
     );
   }
@@ -78,6 +101,7 @@ function StageIcon({ status }: { status: StageStatus }) {
 type StatusEmptyReason = "no_roadmap" | "no_task_done";
 
 const STATUS_DEMO_STORAGE_KEY = "issa_status_demo";
+const CELEBRATE_KEY = "issa_status_celebrate";
 
 const DEFAULT_DEMO_STAGE = 2;
 
@@ -88,6 +112,7 @@ export default function StatusPage() {
   const [isReady, setIsReady] = useState(false);
   const [emptyReason, setEmptyReason] = useState<StatusEmptyReason | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [celebrateIdx, setCelebrateIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem("issa_roadmap");
@@ -138,6 +163,38 @@ export default function StatusPage() {
       // ignore
     }
   }, [demoStage, reachedApproved, isReady, emptyReason]);
+
+  // One-more-visit replay: fire celebration when navigating back to this page
+  useEffect(() => {
+    if (!isReady || emptyReason !== null) return;
+    try {
+      const raw = localStorage.getItem(CELEBRATE_KEY);
+      if (!raw) return;
+      const idx = JSON.parse(raw) as number;
+      localStorage.removeItem(CELEBRATE_KEY); // consume immediately — only plays once more
+      const t1 = setTimeout(() => {
+        setCelebrateIdx(idx);
+        const t2 = setTimeout(() => setCelebrateIdx(null), 2000);
+        return () => clearTimeout(t2);
+      }, 500);
+      return () => clearTimeout(t1);
+    } catch {
+      // ignore
+    }
+  }, [isReady, emptyReason]);
+
+  const handleAdvanceStage = () => {
+    const completedIdx = demoStage; // this stage is about to become "completed"
+    setDemoStage((prev) => prev + 1);
+    setCelebrateIdx(completedIdx);
+    // Save so it replays once on next visit
+    try {
+      localStorage.setItem(CELEBRATE_KEY, JSON.stringify(completedIdx));
+    } catch {
+      // ignore
+    }
+    setTimeout(() => setCelebrateIdx(null), 2000);
+  };
 
   const showDemoReset = reachedApproved || demoStage >= STAGES.length - 1;
 
@@ -293,10 +350,14 @@ export default function StatusPage() {
           const nextStatus = stages[i + 1]?.status;
           const lineGreen = stage.status === "completed" && nextStatus === "completed";
           return (
-            <div key={stage.id} className="flex gap-4">
+            <div
+              key={stage.id}
+              className="flex gap-4 animate-fade-in-up opacity-0 [animation-fill-mode:both]"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
               {/* Icon column — line runs straight through here */}
               <div className="flex flex-col items-center">
-                <StageIcon status={stage.status} />
+                <StageIcon status={stage.status} celebrating={celebrateIdx === i} />
                 {!isLast && (
                   lineGreen
                     ? <div className="w-0.5 flex-1 min-h-8 my-1 bg-green-300" />
@@ -308,7 +369,8 @@ export default function StatusPage() {
                 <p
                   className={`text-sm font-semibold leading-snug ${
                     stage.status === "upcoming" ? "text-gray-400" : "text-gray-800"
-                  }`}
+                  } ${celebrateIdx === i ? "animate-text-brighten" : ""}`}
+                  style={celebrateIdx === i ? { animationDelay: "0.55s" } : undefined}
                 >
                   {stage.label}
                 </p>
@@ -344,8 +406,8 @@ export default function StatusPage() {
         {demoStage < STAGES.length - 1 ? (
           <button
             type="button"
-            onClick={() => setDemoStage((prev) => prev + 1)}
-            className="w-full py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-xl transition-colors"
+            onClick={handleAdvanceStage}
+            className="w-full py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 active:scale-95 text-sm font-medium rounded-xl transition-all"
           >
             Advance to next stage →
           </button>
@@ -367,7 +429,7 @@ export default function StatusPage() {
               }
               router.push("/dashboard/approved");
             }}
-            className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl transition-colors"
+            className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white text-sm font-semibold rounded-xl transition-all"
           >
             Visa approved! See the moment →
           </button>
