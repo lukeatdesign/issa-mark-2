@@ -46,6 +46,7 @@ export default function ChatPage() {
   const setTaskFromRoadmap = useChatTaskPanelStore((s) => s.setTaskFromRoadmap);
   const setGeneralHelp = useChatTaskPanelStore((s) => s.setGeneralHelp);
   const setPanelExpanded = useChatTaskPanelStore((s) => s.setPanelExpanded);
+  const togglePanelExpanded = useChatTaskPanelStore((s) => s.togglePanelExpanded);
   const setThreadMeta    = useChatStore((s) => s.setThreadMeta);
 
   // ── Auto-welcome on first visit after quiz (wait for persisted onboarding) ─
@@ -446,8 +447,32 @@ export default function ChatPage() {
         />
       </div>
 
-      {/* ── Side panel: persisted task helper + collapse ───────────────────── */}
-      {panelExpanded ? (
+      {/* ── Persistent seam handle ──────────────────────────────────────────── */}
+      <div className="relative flex-shrink-0 w-3 overflow-visible z-10">
+        <button
+          type="button"
+          onClick={togglePanelExpanded}
+          title={panelExpanded ? "Hide steps panel" : "Show steps panel"}
+          className="absolute top-1/2 -translate-y-1/2 right-0 flex flex-col items-center gap-1.5 bg-white border border-gray-200 border-r-0 shadow-md rounded-l-xl px-2 py-5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors group"
+        >
+          <ChevronLeftIcon
+            className={`w-3.5 h-3.5 transition-transform duration-300 ${panelExpanded ? "rotate-180" : ""}`}
+          />
+          <span
+            className="text-[10px] font-medium leading-tight text-gray-400 group-hover:text-gray-600 transition-colors"
+            style={{ writingMode: "vertical-rl" }}
+          >
+            Steps
+          </span>
+        </button>
+      </div>
+
+      {/* ── Side panel — width transition gives slide in/out ───────────────── */}
+      <div
+        className={`flex-shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
+          panelExpanded ? "w-72" : "w-0"
+        }`}
+      >
         <TaskPanel
           key={taskPanelKey}
           task={activeTask}
@@ -472,23 +497,7 @@ export default function ChatPage() {
           onSelectGeneral={setGeneralHelp}
           onCollapsePanel={() => setPanelExpanded(false)}
         />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setPanelExpanded(true)}
-          className="w-10 shrink-0 border-l border-gray-100 bg-white hover:bg-gray-50 flex flex-col items-center justify-center gap-2 py-6 text-gray-500 transition-colors"
-          title="Show help panel"
-          aria-label="Show help panel"
-        >
-          <ChevronLeftIcon className="w-4 h-4" />
-          <span
-            className="text-[10px] font-medium text-gray-600 leading-tight"
-            style={{ writingMode: "vertical-rl" }}
-          >
-            Steps
-          </span>
-        </button>
-      )}
+      </div>
 
       <ConsultantDrawer
         open={drawerOpen}

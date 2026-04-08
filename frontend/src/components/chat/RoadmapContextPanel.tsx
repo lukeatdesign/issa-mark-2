@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   MapIcon,
@@ -362,6 +362,15 @@ function ContextSummary({ answers }: { answers: QuizAnswers }) {
   );
 }
 
+const BUTTON_SPARKLES = [
+  { style: { top: "-7px", left: "15%" },                              delay: "0ms"   },
+  { style: { top: "-7px", left: "50%", transform: "translateX(-50%)" }, delay: "50ms"  },
+  { style: { top: "-7px", right: "15%" },                             delay: "25ms"  },
+  { style: { bottom: "-7px", left: "15%" },                           delay: "80ms"  },
+  { style: { bottom: "-7px", left: "50%", transform: "translateX(-50%)" }, delay: "100ms" },
+  { style: { bottom: "-7px", right: "15%" },                          delay: "40ms"  },
+];
+
 // ── main component ────────────────────────────────────────────────────────────
 
 type PopoverView = "status";
@@ -399,11 +408,57 @@ export default function RoadmapContextPanel({
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>("status");
   const [formValues, setFormValues] = useState<QuizAnswers>({ ...quizAnswers });
+  const [celebrating, setCelebrating] = useState(false);
+  const [isFirstTimeOpen, setIsFirstTimeOpen] = useState(false);
+  const [showLaterToast, setShowLaterToast] = useState(false);
 
   const contextSignals = [hasNationality, hasTimeline, hasEmployerContext];
   const signalCount = contextSignals.filter(Boolean).length;
   const isReady = signalCount === 3 && chatReady;
   const hasRoadmap = !!roadmap;
+
+  const mountedRef = useRef(false);
+  const prevIsReadyRef = useRef(false);
+  const prevHasRoadmapRef = useRef(false);
+  const hasAutoOpenedRef = useRef(false);
+  const laterToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      prevIsReadyRef.current = isReady;
+      prevHasRoadmapRef.current = hasRoadmap;
+      return;
+    }
+    const justReady = isReady && !prevIsReadyRef.current;
+    const justGotRoadmap = hasRoadmap && !prevHasRoadmapRef.current;
+    prevIsReadyRef.current = isReady;
+    prevHasRoadmapRef.current = hasRoadmap;
+    if (justReady || justGotRoadmap) {
+      setCelebrating(true);
+      const t = setTimeout(() => setCelebrating(false), 800);
+      if (justReady && !hasAutoOpenedRef.current) {
+        hasAutoOpenedRef.current = true;
+        setView("status");
+        setOpen(true);
+        setIsFirstTimeOpen(true);
+        setShowLaterToast(false);
+      }
+      return () => clearTimeout(t);
+    }
+  }, [isReady, hasRoadmap]);
+
+  useEffect(() => () => {
+    if (laterToastTimerRef.current) clearTimeout(laterToastTimerRef.current);
+  }, []);
+
+  const handleLater = () => {
+    setOpen(false);
+    setIsFirstTimeOpen(false);
+    setShowLaterToast(true);
+    if (laterToastTimerRef.current) clearTimeout(laterToastTimerRef.current);
+    laterToastTimerRef.current = setTimeout(() => setShowLaterToast(false), 3000);
+  };
 
   const patchForm = (patch: Partial<QuizAnswers>) =>
     setFormValues((prev) => ({ ...prev, ...patch }));
@@ -476,20 +531,25 @@ export default function RoadmapContextPanel({
   if (view === "status") {
     if (hasRoadmap) {
       popoverContent = (
-        <div className="w-64">
+        <div className="w-72">
           <div className="flex items-start justify-between mb-1">
             <div>
               <p className="text-sm font-semibold text-gray-800">Your roadmap is ready</p>
               <p className="text-xs text-gray-400 mt-0.5">Based on the context below.</p>
             </div>
-            <button
-              type="button"
-              onClick={() => openModal("edit")}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 mt-0.5 flex-shrink-0 ml-2"
-            >
-              <PencilSquareIcon className="w-3.5 h-3.5" />
-              Edit
-            </button>
+            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => openModal("edit")}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 mt-0.5"
+              >
+                <PencilSquareIcon className="w-3.5 h-3.5" />
+                Edit
+              </button>
+              <button type="button" onClick={() => setOpen(false)} className="text-gray-300 hover:text-gray-500 mt-0.5">
+                <XMarkIcon className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
           <ContextSummary answers={quizAnswers} />
           <Link
@@ -501,36 +561,86 @@ export default function RoadmapContextPanel({
         </div>
       );
     } else if (isReady) {
-      popoverContent = (
-        <div className="w-64">
-          <p className="text-sm font-semibold text-gray-800 mb-0.5">Ready to generate</p>
-          <p className="text-xs text-gray-400 mb-3">Compass has enough context.</p>
-          <ContextSummary answers={quizAnswers} />
-          <div className="flex gap-2 mt-1">
-            <button
-              type="button"
-              onClick={onGenerate}
-              disabled={isGenerating}
-              className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white rounded-lg py-2 transition-colors"
-            >
-              {isGenerating ? (
-                <><span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />Generating…</>
-              ) : "Generate →"}
-            </button>
-            <button
-              type="button"
-              onClick={() => openModal("edit")}
-              className="px-2.5 text-xs border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-lg py-2 transition-colors"
-            >
-              Edit
-            </button>
+      if (isFirstTimeOpen) {
+        popoverContent = (
+          <div className="w-80">
+            <div className="flex items-start justify-between mb-1">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Your roadmap is ready to generate!</p>
+                <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">Compass has enough context to build your personalised plan.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setOpen(false); setIsFirstTimeOpen(false); }}
+                className="text-gray-300 hover:text-gray-500 ml-2 mt-0.5 flex-shrink-0"
+              >
+                <XMarkIcon className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <ContextSummary answers={quizAnswers} />
+            <div className="flex flex-col gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => { onGenerate(); setOpen(false); setIsFirstTimeOpen(false); }}
+                disabled={isGenerating}
+                className="w-full flex items-center justify-center gap-1.5 text-xs font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white rounded-lg py-2.5 transition-colors"
+              >
+                {isGenerating ? (
+                  <><span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />Generating…</>
+                ) : "Generate now →"}
+              </button>
+              <button
+                type="button"
+                onClick={handleLater}
+                className="w-full text-xs text-gray-500 hover:text-gray-700 border border-gray-200 hover:bg-gray-50 rounded-lg py-2 transition-colors"
+              >
+                Later, I need to talk a bit more
+              </button>
+            </div>
           </div>
-        </div>
-      );
+        );
+      } else {
+        popoverContent = (
+          <div className="w-80">
+            <div className="flex items-start justify-between mb-0.5">
+              <p className="text-sm font-semibold text-gray-800">Ready to generate</p>
+              <button type="button" onClick={() => setOpen(false)} className="text-gray-300 hover:text-gray-500 ml-2 flex-shrink-0">
+                <XMarkIcon className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mb-3">Compass has enough context.</p>
+            <ContextSummary answers={quizAnswers} />
+            <div className="flex gap-2 mt-1">
+              <button
+                type="button"
+                onClick={onGenerate}
+                disabled={isGenerating}
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white rounded-lg py-2 transition-colors"
+              >
+                {isGenerating ? (
+                  <><span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />Generating…</>
+                ) : "Generate →"}
+              </button>
+              <button
+                type="button"
+                onClick={() => openModal("edit")}
+                className="px-2.5 text-xs border border-gray-200 hover:bg-gray-50 text-gray-500 rounded-lg py-2 transition-colors"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        );
+      }
     } else {
       popoverContent = (
-        <div className="w-56">
-          <p className="text-sm font-semibold text-gray-800 mb-0.5">Not ready yet</p>
+        <div className="w-64">
+          <div className="flex items-start justify-between mb-0.5">
+            <p className="text-sm font-semibold text-gray-800">Not ready yet</p>
+            <button type="button" onClick={() => setOpen(false)} className="text-gray-300 hover:text-gray-500 ml-2 flex-shrink-0">
+              <XMarkIcon className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <p className="text-xs text-gray-400">Chat a bit more, or fill in manually.</p>
           <ReadinessSignals
             hasNationality={hasNationality}
@@ -563,10 +673,33 @@ export default function RoadmapContextPanel({
         </div>
       )}
 
+      {/* "Later" toast */}
+      {showLaterToast && (
+        <div className="mb-2 inline-flex items-start gap-2 bg-white border border-gray-200 shadow-sm text-gray-600 text-xs rounded-xl px-3.5 py-2.5 max-w-xs leading-relaxed animate-fade-in">
+          <span className="mt-px">💡</span>
+          <span>You can generate your roadmap whenever you feel ready.</span>
+        </div>
+      )}
+
       {/* Toggle button */}
-      <button type="button" onClick={togglePopover} className={buttonClass}>
-        {buttonContent}
-      </button>
+      <div className="relative w-fit">
+        <button
+          type="button"
+          onClick={togglePopover}
+          className={`${buttonClass} ${celebrating ? "animate-celebrate-pop" : ""}`}
+        >
+          {buttonContent}
+        </button>
+        {celebrating && BUTTON_SPARKLES.map((cfg, k) => (
+          <span
+            key={k}
+            className={`absolute w-1.5 h-1.5 rounded-full animate-sparkle-fade pointer-events-none ${
+              hasRoadmap ? "bg-teal-400" : "bg-brand-400"
+            }`}
+            style={{ ...cfg.style, animationDelay: cfg.delay }}
+          />
+        ))}
+      </div>
 
       {/* Modal — form / edit / confirm-regen */}
       {isModalOpen && (

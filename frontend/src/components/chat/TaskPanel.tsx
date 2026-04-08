@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { ChatMessage, ChatActiveTask } from "@/types";
 import type { RoadmapTask } from "@/lib/api";
 import type { ChatHelpMode } from "@/store/chatTaskPanel";
@@ -204,15 +203,6 @@ export default function TaskPanel({
 
   const panelChrome = (
     <div className="px-3 py-2.5 border-b border-gray-100 bg-white flex-shrink-0 flex items-start gap-2">
-      <button
-        type="button"
-        onClick={onCollapsePanel}
-        className="mt-5 shrink-0 p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-        title="Hide panel"
-        aria-label="Hide side panel"
-      >
-        <ChevronRightIcon className="w-4 h-4" />
-      </button>
       <div className="flex-1 min-w-0">
         <label
           htmlFor="chat-task-select"

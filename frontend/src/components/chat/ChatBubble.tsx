@@ -8,6 +8,13 @@ interface ChatBubbleProps {
   onChipSelect: (text: string) => void;
 }
 
+
+function preprocessMarkdown(content: string): string {
+  return content
+    .replace(/^[ \t]*(?:[-*]|\d+\.)\s+(.+)$/gm, "$1")
+    .replace(/\n/g, "  \n");
+}
+
 export default function ChatBubble({ message, onChipSelect }: ChatBubbleProps) {
   const isUser = message.role === "user";
 
@@ -25,14 +32,8 @@ export default function ChatBubble({ message, onChipSelect }: ChatBubbleProps) {
           {isUser ? (
             message.content
           ) : (
-            <ReactMarkdown
-              components={{
-                ol: ({ children }) => (
-                  <ol className="list-none pl-0 my-1">{children}</ol>
-                ),
-              }}
-            >
-              {message.content}
+            <ReactMarkdown>
+              {preprocessMarkdown(message.content)}
             </ReactMarkdown>
           )}
         </div>

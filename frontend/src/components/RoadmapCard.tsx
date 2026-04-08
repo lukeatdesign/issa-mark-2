@@ -291,27 +291,31 @@ function TaskCard({
           <div className="mt-3 ml-8 space-y-2">
             {/* Subtasks */}
             {task.subtasks?.length > 0 && (
-              <ol className="space-y-1.5">
+              <ol className="space-y-1">
                 {task.subtasks.map((step, i) => (
-                  <li key={i} className="flex items-start gap-2">
+                  <li key={i}>
                     <button
                       type="button"
                       onClick={() => toggleSubtask(i)}
-                      className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all active:scale-90 ${
-                        subtaskChecked[i]
-                          ? "bg-brand-600 border-brand-600 animate-scale-pop"
-                          : "border-gray-300 hover:border-brand-400"
-                      }`}
+                      className="flex items-start gap-2 w-full text-left group py-0.5 rounded hover:bg-gray-50 active:scale-[0.99] transition-all"
                     >
-                      {subtaskChecked[i] && (
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                      <div
+                        className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
+                          subtaskChecked[i]
+                            ? "bg-brand-600 border-brand-600 animate-scale-pop"
+                            : "border-gray-300 group-hover:border-brand-400"
+                        }`}
+                      >
+                        {subtaskChecked[i] && (
+                          <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <span className={`text-xs leading-relaxed ${subtaskChecked[i] ? "line-through text-gray-400" : "text-gray-600"}`}>
+                        {step}
+                      </span>
                     </button>
-                    <span className={`text-xs leading-relaxed ${subtaskChecked[i] ? "line-through text-gray-400" : "text-gray-600"}`}>
-                      {step}
-                    </span>
                   </li>
                 ))}
               </ol>
