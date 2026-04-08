@@ -482,6 +482,15 @@ function NationalityTypeahead({
   };
 
   const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (open && matches.length > 0 && matches[highlighted]) {
+        handleSelect(matches[highlighted]);
+      } else if (!open && value) {
+        onContinue();
+      }
+      return;
+    }
     if (!open || matches.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -489,9 +498,6 @@ function NationalityTypeahead({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setHighlighted((h) => Math.max(h - 1, 0));
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (matches[highlighted]) handleSelect(matches[highlighted]);
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -561,6 +567,12 @@ function RegisterModal({ onSuccess }: { onSuccess: (token: string, username: str
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -578,11 +590,11 @@ function RegisterModal({ onSuccess }: { onSuccess: (token: string, username: str
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${visible ? "bg-black/50" : "bg-black/0"}`}>
+      <div className={`bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 transition-all duration-300 ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-95"}`}>
         <div className="mb-6">
-          <h2 className="text-xl font-display font-semibold text-gray-900">Create your account</h2>
-          <p className="text-sm text-gray-600 mt-1">Save your roadmap and continue your journey.</p>
+          <h2 className="text-xl font-display font-semibold text-gray-900">Create your account to proceed</h2>
+          <p className="text-sm text-gray-600 mt-1">You're almost there — save your progress and get your personalized roadmap.</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -622,6 +634,7 @@ export default function OnboardingPage() {
   const resetChat = useChatStore((s) => s.reset);
   const resetTaskPanel = useChatTaskPanelStore((s) => s.setGeneralHelp);
   const [showRegister, setShowRegister] = useState(false);
+  const [showProceedingScreen, setShowProceedingScreen] = useState(false);
   const [nameInput, setNameInput] = useState((answers as Record<string, string>)["name"] ?? "");
 
   // Animation state
@@ -714,7 +727,9 @@ export default function OnboardingPage() {
       APP_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
     }
     setAuth(token, username);
-    router.push("/dashboard/chat");
+    setShowRegister(false);
+    setShowProceedingScreen(true);
+    setTimeout(() => router.push("/dashboard/chat"), 2500);
   };
 
   // ── render ──────────────────────────────────────────────────────────────────
@@ -844,6 +859,16 @@ export default function OnboardingPage() {
       </div>
 
       {showRegister && <RegisterModal onSuccess={handleRegistered} />}
+
+      {showProceedingScreen && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-5 animate-fade-in">
+          <span className="w-10 h-10 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+          <div className="text-center space-y-2 max-w-xs">
+            <p className="text-base font-semibold text-gray-900">Taking you to your guide…</p>
+            <p className="text-sm text-gray-500 leading-relaxed">Ask further questions or share more details to generate your personalized roadmap.</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
