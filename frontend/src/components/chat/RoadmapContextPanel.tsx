@@ -491,7 +491,16 @@ export default function RoadmapContextPanel({
   let buttonClass: string;
   let buttonContent: React.ReactNode;
 
-  if (hasRoadmap) {
+  if (isGenerating) {
+    buttonClass = "flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100 transition-colors";
+    buttonContent = (
+      <>
+        <span className="w-3 h-3 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
+        Generating Roadmap
+        {open ? <ChevronDownIcon className="w-3 h-3" /> : <ChevronUpIcon className="w-3 h-3" />}
+      </>
+    );
+  } else if (hasRoadmap) {
     buttonClass = "flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100 transition-colors";
     buttonContent = (
       <>
@@ -581,7 +590,7 @@ export default function RoadmapContextPanel({
             <div className="flex flex-col gap-2 mt-2">
               <button
                 type="button"
-                onClick={() => { onGenerate(); setOpen(false); setIsFirstTimeOpen(false); }}
+                onClick={() => { onGenerate(); setIsFirstTimeOpen(false); }}
                 disabled={isGenerating}
                 className="w-full flex items-center justify-center gap-1.5 text-xs font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white rounded-lg py-2.5 transition-colors"
               >

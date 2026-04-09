@@ -651,8 +651,12 @@ export default function OnboardingPage() {
 
   const advance = () => {
     if (isLastStep) {
-      if (isLoggedIn) { router.push("/dashboard/chat"); }
-      else { setShowRegister(true); }
+      if (isLoggedIn) {
+        setShowProceedingScreen(true);
+        setTimeout(() => router.push("/dashboard/chat"), 2500);
+      } else {
+        setShowRegister(true);
+      }
     } else {
       nextStep();
     }

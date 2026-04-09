@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { useOnboardingStore } from "@/store/onboarding";
@@ -19,31 +19,9 @@ const APP_STORAGE_KEYS = [
   "issa_subtask_progress",
 ];
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function Toast({ message, onDone }: { message: string; onDone: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onDone, 3500);
-    return () => clearTimeout(t);
-  }, [onDone]);
-
-  return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-lg animate-slide-up">
-      <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-      </svg>
-      {message}
-    </div>
-  );
-}
 
 // ── Sign In form ──────────────────────────────────────────────────────────────
-function SignInForm({ onSwitchTab }: { onSwitchTab: () => void }) {
-  const router = useRouter();
-  const { lastUsername, setAuth } = useAuthStore();
-  const resetOnboarding = useOnboardingStore((s) => s.reset);
-  const resetChat = useChatStore((s) => s.reset);
-  const resetTaskPanel = useChatTaskPanelStore((s) => s.setGeneralHelp);
-
+function SignInForm({ onSwitchTab, onSuccess }: { onSwitchTab: () => void; onSuccess: (token: string, username: string, dest: string) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -55,17 +33,7 @@ function SignInForm({ onSwitchTab }: { onSwitchTab: () => void }) {
     setLoading(true);
     try {
       const res = await api.post("/login", { username: username.trim(), password });
-      const incomingUsername = res.data.username;
-
-      resetChat();
-      resetTaskPanel();
-      if (lastUsername && lastUsername !== incomingUsername) {
-        APP_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
-        resetOnboarding();
-      }
-
-      setAuth(res.data.token, incomingUsername);
-      router.replace("/dashboard");
+      onSuccess(res.data.token, res.data.username, "/dashboard/chat");
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
@@ -138,7 +106,7 @@ function SignUpForm({
   onSuccess,
 }: {
   onSwitchTab: () => void;
-  onSuccess: (username: string) => void;
+  onSuccess: (token: string, username: string) => void;
 }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -155,8 +123,8 @@ function SignUpForm({
     }
     setLoading(true);
     try {
-      await api.post("/register", { username: username.trim(), password });
-      onSuccess(username.trim());
+      const res = await api.post("/register", { username: username.trim(), password });
+      onSuccess(res.data.token, res.data.username);
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
@@ -242,18 +210,59 @@ function SignUpForm({
   );
 }
 
+// ── Proceeding screen ─────────────────────────────────────────────────────────
+function ProceedingScreen() {
+  return (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-5 animate-fade-in">
+      <span className="w-10 h-10 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+      <div className="text-center space-y-2 max-w-xs">
+        <p className="text-base font-semibold text-gray-900">Taking you to your guide…</p>
+        <p className="text-sm text-gray-500 leading-relaxed">Ask further questions or share more details to generate your personalized roadmap.</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Inner page (needs Suspense for useSearchParams) ───────────────────────────
 function LoginPageInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const { lastUsername, setAuth } = useAuthStore();
+  const resetOnboarding = useOnboardingStore((s) => s.reset);
+  const resetChat = useChatStore((s) => s.reset);
+  const resetTaskPanel = useChatTaskPanelStore((s) => s.setGeneralHelp);
+
   const [tab, setTab] = useState<"signin" | "signup">(
     searchParams.get("tab") === "signup" ? "signup" : "signin"
   );
-  const [toast, setToast] = useState<string | null>(null);
+  const [proceeding, setProceeding] = useState(false);
 
-  const handleSignUpSuccess = (username: string) => {
-    setTab("signin");
-    setToast(`Account "${username}" created! You can now sign in.`);
+  const handleProceed = (dest: string) => {
+    setProceeding(true);
+    setTimeout(() => router.replace(dest), 2500);
   };
+
+  const handleSignInSuccess = (token: string, username: string, dest: string) => {
+    resetChat();
+    resetTaskPanel();
+    if (lastUsername && lastUsername !== username) {
+      APP_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+      resetOnboarding();
+    }
+    setAuth(token, username);
+    handleProceed(dest);
+  };
+
+  const handleSignUpSuccess = (token: string, username: string) => {
+    resetChat();
+    resetTaskPanel();
+    APP_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+    resetOnboarding();
+    setAuth(token, username);
+    router.replace("/onboarding");
+  };
+
+  if (proceeding) return <ProceedingScreen />;
 
   return (
     <>
@@ -295,7 +304,7 @@ function LoginPageInner() {
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-8 py-8">
             {tab === "signin" ? (
-              <SignInForm onSwitchTab={() => setTab("signup")} />
+              <SignInForm onSwitchTab={() => setTab("signup")} onSuccess={handleSignInSuccess} />
             ) : (
               <SignUpForm
                 onSwitchTab={() => setTab("signin")}
@@ -305,8 +314,6 @@ function LoginPageInner() {
           </div>
         </div>
       </div>
-
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
     </>
   );
 }

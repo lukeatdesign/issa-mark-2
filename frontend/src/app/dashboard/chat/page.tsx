@@ -108,8 +108,9 @@ export default function ChatPage() {
     };
     const intentPhrase = intentPhrases[intent ?? ""] ?? "you're planning to work in Thailand";
 
+    const nameGreeting = quizAnswers.name ? `${quizAnswers.name}! ` : "";
     const welcome =
-      `Hi! I'm Compass, your AI immigration guide.\n\n` +
+      `Hi ${nameGreeting}I'm Compass, your AI immigration guide.\n\n` +
       `Based on what you've told me — you're from **${natLabel}** and ${intentPhrase} — ` +
       `it looks like the **${pathLabel}** route is right for you.\n\n` +
       `I'll walk you through every step, from paperwork to having everything in order. ` +
