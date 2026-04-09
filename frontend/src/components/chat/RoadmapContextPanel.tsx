@@ -285,7 +285,7 @@ function ContextModal({
                 disabled={view === "form" ? !formReady : false}
                 className="flex-1 text-sm font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl py-2.5 transition-colors"
               >
-                {view === "form" ? "Save context" : "Save & review changes →"}
+                {view === "form" ? "Save context" : "Save and Regenerate Roadmap"}
               </button>
               <button
                 type="button"
@@ -478,7 +478,7 @@ export default function RoadmapContextPanel({
   const handleConfirmRegen = () => {
     onRegenerateWithNewContext(formValues);
     closeModal();
-    setOpen(false);
+    setOpen(true);
   };
 
   const togglePopover = () => {
@@ -538,7 +538,17 @@ export default function RoadmapContextPanel({
   let popoverContent: React.ReactNode = null;
 
   if (view === "status") {
-    if (hasRoadmap) {
+    if (isGenerating) {
+      popoverContent = (
+        <div className="w-72 flex flex-col items-center gap-3 py-2">
+          <span className="w-7 h-7 border-[3px] border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+          <div className="text-center">
+            <p className="text-sm font-semibold text-gray-800">Generating your roadmap…</p>
+            <p className="text-xs text-gray-400 mt-0.5">This usually takes a few seconds.</p>
+          </div>
+        </div>
+      );
+    } else if (hasRoadmap) {
       popoverContent = (
         <div className="w-72">
           <div className="flex items-start justify-between mb-1">

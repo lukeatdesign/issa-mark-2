@@ -251,7 +251,11 @@ export default function TaskPanel({
     .slice(-3)
     .map((m) => m.content)
     .join(" ");
-  const aiSuggestsDone = AI_DONE_PATTERN.test(recentAiText) && !dismissedSuggest;
+
+  const lastUserMessage = messages.filter((m) => m.role === "user").slice(-1)[0]?.content ?? "";
+  const lastMessageWasQuestion = lastUserMessage.trim().endsWith("?");
+
+  const aiSuggestsDone = AI_DONE_PATTERN.test(recentAiText) && !dismissedSuggest && !lastMessageWasQuestion;
 
   const recentUserText = messages
     .filter((m) => m.role === "user")
@@ -364,6 +368,7 @@ export default function TaskPanel({
                     userMessageCount > 0 &&
                     !subtaskChecked[i] &&
                     !subtaskDismissedSuggest[i] &&
+                    !lastMessageWasQuestion &&
                     userTextSuggestsSubtask(recentUserText, step);
 
                   return (
