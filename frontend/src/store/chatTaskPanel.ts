@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ChatActiveTask } from "@/types";
 import type { RoadmapTask } from "@/lib/api";
@@ -65,6 +65,6 @@ export const useChatTaskPanelStore = create<ChatTaskPanelState>()(
           helpMode: "general",
         }),
     }),
-    { name: "issa_chat_task_panel" }
+    { name: "wayfarer_chat_task_panel" }
   )
 );

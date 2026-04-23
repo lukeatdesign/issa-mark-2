@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ const STAGES: Stage[] = [
   {
     id: 1,
     label: "Documents verified",
-    description: "Issa reviewed and approved your documents",
+    description: "Wayfarer reviewed and approved your documents",
     date: "Completed Apr 8, 2026",
     status: "completed",
   },
@@ -100,8 +100,8 @@ function StageIcon({ status, celebrating }: { status: StageStatus; celebrating?:
 
 type StatusEmptyReason = "no_roadmap" | "no_task_done";
 
-const STATUS_DEMO_STORAGE_KEY = "issa_status_demo";
-const CELEBRATE_KEY = "issa_status_celebrate";
+const STATUS_DEMO_STORAGE_KEY = "wayfarer_status_demo";
+const CELEBRATE_KEY = "wayfarer_status_celebrate";
 
 const DEFAULT_DEMO_STAGE = 2;
 
@@ -115,7 +115,7 @@ export default function StatusPage() {
   const [celebrateIdx, setCelebrateIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (!raw) {
       setEmptyReason("no_roadmap");
       setIsReady(true);
@@ -245,7 +245,7 @@ export default function StatusPage() {
               <span className="-ml-1">Short descriptions of each step (embassy, employer, etc.)</span>
             </li>
             <li>
-              <span className="-ml-1">Encouragement and rough timing where Issa has updates</span>
+              <span className="-ml-1">Encouragement and rough timing where Wayfarer has updates</span>
             </li>
           </ul>
         </div>
@@ -269,7 +269,7 @@ export default function StatusPage() {
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
           You already have a roadmap, but the live timeline hasn&apos;t started yet. This view
           fills in once you complete real progress—for example, after you work through{" "}
-          <strong className="font-medium text-gray-800">Documents</strong> and hand off to Issa, or
+          <strong className="font-medium text-gray-800">Documents</strong> and hand off to Wayfarer, or
           when steps on your roadmap are checked off.
         </p>
         <div className="rounded-2xl border border-gray-100 bg-white p-5 mb-8">
@@ -281,7 +281,7 @@ export default function StatusPage() {
               <span className="-ml-1">Gather files on Documents and mark them ready</span>
             </li>
             <li>
-              <span className="-ml-1">Send your pack to Issa when prompted</span>
+              <span className="-ml-1">Send your pack to Wayfarer when prompted</span>
             </li>
             <li>
               <span className="-ml-1">Come back here for embassy and employer milestones</span>
@@ -336,7 +336,7 @@ export default function StatusPage() {
       <h1 className="text-xl font-display font-semibold text-gray-900 mb-1">
         Your application status
       </h1>
-      <p className="text-sm text-gray-500 mb-4">Updated in real time by Issa&apos;s team</p>
+      <p className="text-sm text-gray-500 mb-4">Updated in real time by Wayfarer&apos;s team</p>
 
       {/* Teal banner */}
       <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800 mb-8">
@@ -401,7 +401,7 @@ export default function StatusPage() {
       {/* Demo button — always visible, changes label at final stage */}
       <div className="mt-10 pt-6 border-t border-gray-100">
         <p className="text-xs text-gray-400 mb-3 text-center">
-          Demo: simulate an update from Issa&apos;s team
+          Demo: simulate an update from Wayfarer&apos;s team
         </p>
         {demoStage < STAGES.length - 1 ? (
           <button

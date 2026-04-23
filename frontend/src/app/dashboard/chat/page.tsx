@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useChatStore, GENERAL_THREAD_ID } from "@/store/chat";
 import {
@@ -72,7 +72,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("issa_roadmap");
+      const raw = localStorage.getItem("wayfarer_roadmap");
       if (raw) setRoadmap(JSON.parse(raw));
     } catch {
       // ignore
@@ -129,9 +129,9 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!chatHydrated) return;
-    const raw = localStorage.getItem("issa_active_task");
+    const raw = localStorage.getItem("wayfarer_active_task");
     if (!raw) return;
-    localStorage.removeItem("issa_active_task");
+    localStorage.removeItem("wayfarer_active_task");
 
     try {
       const t = JSON.parse(raw) as {
@@ -281,7 +281,7 @@ export default function ChatPage() {
     try {
       const answers = answersOverride ?? quizAnswers;
       const result = await generateRoadmap(buildHistory(), answers);
-      localStorage.setItem("issa_roadmap", JSON.stringify(result));
+      localStorage.setItem("wayfarer_roadmap", JSON.stringify(result));
       setRoadmap(result);
     } catch {
       // silent
@@ -320,7 +320,7 @@ export default function ChatPage() {
         }));
       }
 
-      localStorage.setItem("issa_roadmap", JSON.stringify(newRoadmap));
+      localStorage.setItem("wayfarer_roadmap", JSON.stringify(newRoadmap));
       setRoadmap(newRoadmap);
     } catch {
       // silent

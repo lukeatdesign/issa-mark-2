@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatActiveTask, QuizAnswers } from "@/types";
+﻿import type { ChatMessage, ChatActiveTask, QuizAnswers } from "@/types";
 
 const AI_DONE_RE =
   /\b(completed|finished|done|all set|good to go|successfully|next step|marked as|well done|congratulations)\b/i;
@@ -109,7 +109,7 @@ export function deriveTaskSuggestions(
     chips.push("Walk me through all the steps in order");
     chips.push("What documents do I need for this?");
     if (task.canAutomate) {
-      chips.push("What can Issa handle for me automatically?");
+      chips.push("What can Wayfarer handle for me automatically?");
     }
     return chips.slice(0, 3);
   }

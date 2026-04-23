@@ -1,4 +1,4 @@
-# Migration Prompt — Issa Compass Mark 2
+﻿# Migration Prompt — Wayfarer Mark 2
 
 Paste this **entire file** as your first message in a new Claude Code conversation. Make sure the new conversation's working directory is set to `C:\issa-compass-mark-2` (open it via File → Open Folder in the Claude Code desktop app, or `cd C:\issa-compass-mark-2` before launching).
 
@@ -12,13 +12,13 @@ This is a **continuation** of an existing project. The repo already exists at `C
 
 ## Project context
 
-**Issa Compass Mark 2** — Thailand work immigration assistant. Full-stack demo app (no email verification, demo accounts only).
+**Wayfarer Mark 2** — Thailand work immigration assistant. Full-stack demo app (no email verification, demo accounts only).
 
 - **Repo:** `C:\issa-compass-mark-2`
 - **Stack:** Next.js 14 App Router · Flask · Supabase · Claude AI (claude-sonnet-4-6)
 - **Frontend:** `frontend/` — Tailwind, Zustand (persist middleware), Heroicons v2
 - **Backend:** `backend/` — Flask, `app.py` (routes), `chat.py` (Claude calls)
-- **Auth:** JWT stored in Zustand `useAuthStore` (`issa_auth` localStorage key), no Supabase magic link — plain username/password via `/login` and `/register`
+- **Auth:** JWT stored in Zustand `useAuthStore` (`wayfarer_auth` localStorage key), no Supabase magic link — plain username/password via `/login` and `/register`
 
 ---
 
@@ -52,13 +52,13 @@ Stepper: absolute-track pattern, `justify-between` circles, labels below. `total
 After last step: logged-in users → `/dashboard/chat`; guests → `RegisterModal`.
 
 ### Key stores (`frontend/src/store/`)
-- `auth.ts` — `useAuthStore` — `isLoggedIn`, `token`, `username`, `lastUsername`, `clearAuth()`, persisted as `issa_auth`
-- `onboarding.ts` — `useOnboardingStore` — `currentStep`, `answers`, `totalSteps` (not persisted), persisted as `issa_onboarding`
-- `chat.ts` — `useChatStore` — multi-thread message store (`threads: Record<threadId, ChatMessage[]>`), `GENERAL_THREAD_ID`, persisted as `issa_chat`
+- `auth.ts` — `useAuthStore` — `isLoggedIn`, `token`, `username`, `lastUsername`, `clearAuth()`, persisted as `wayfarer_auth`
+- `onboarding.ts` — `useOnboardingStore` — `currentStep`, `answers`, `totalSteps` (not persisted), persisted as `wayfarer_onboarding`
+- `chat.ts` — `useChatStore` — multi-thread message store (`threads: Record<threadId, ChatMessage[]>`), `GENERAL_THREAD_ID`, persisted as `wayfarer_chat`
 - `chatTaskPanel.ts` — `useChatTaskPanelStore` — `helpMode`, `activeTask`, `panelExpanded`
 
 ### localStorage keys in use
-`issa_auth`, `issa_onboarding`, `issa_chat`, `issa_roadmap`, `issa_overview_cache`, `issa_docs_count`, `issa_active_task`, `issa_documents_checklist`
+`wayfarer_auth`, `wayfarer_onboarding`, `wayfarer_chat`, `wayfarer_roadmap`, `wayfarer_overview_cache`, `wayfarer_docs_count`, `wayfarer_active_task`, `wayfarer_documents_checklist`
 
 On user switch (detected via `lastUsername`): all app keys are cleared + stores reset.
 
@@ -69,13 +69,13 @@ On user switch (detected via `lastUsername`): all app keys are cleared + stores 
 - `RoadmapContextPanel`: readiness signals, generate/regenerate roadmap button
 
 ### TaskPanel (`frontend/src/components/chat/TaskPanel.tsx`)
-- `done` state lazy-initialised from `issa_roadmap` localStorage (survives navigation)
+- `done` state lazy-initialised from `wayfarer_roadmap` localStorage (survives navigation)
 - `markTaskDoneByName` iterates both `userTasks` and `employerTasks`
 - "Yes, done" button calls `writeSubtaskChecked()` before state update
 - "Go to Overview" → `/dashboard`
 
 ### Documents (`frontend/src/app/dashboard/documents/page.tsx` + overview)
-- Source of truth: `issa_documents_checklist` localStorage key — `{ ready: Record<string, boolean> }`
+- Source of truth: `wayfarer_documents_checklist` localStorage key — `{ ready: Record<string, boolean> }`
 - Overview `DocumentsCard` reads from same key, teal color scheme
 
 ### Application Status (`frontend/src/app/dashboard/status/page.tsx`)

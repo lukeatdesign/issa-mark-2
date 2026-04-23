@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Lora, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -17,7 +17,7 @@ const dmSans = DM_Sans({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Issa Compass — Thailand Work Immigration Assistant",
+  title: "Wayfarer — Thailand Work Immigration Assistant",
   description:
     "Your intelligent guide to working legally in Thailand — for workers, professionals, and digital nomads.",
 };

@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatActiveTask } from "@/types";
+﻿import type { ChatMessage, ChatActiveTask } from "@/types";
 import type { RoadmapData } from "@/lib/api";
 import { resolveSubtaskProgressKey } from "@/lib/subtaskProgress";
 
@@ -21,7 +21,7 @@ export function readRoadmapFromStorage(): Pick<
   "userTasks" | "employerTasks"
 > | null {
   try {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (!raw) return null;
     const data = JSON.parse(raw) as RoadmapData;
     if (!data?.userTasks || !data?.employerTasks) return null;

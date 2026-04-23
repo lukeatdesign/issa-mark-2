@@ -1,4 +1,4 @@
-# Thailand Work Immigration Assistant — Project Spec
+﻿# Thailand Work Immigration Assistant — Project Spec
 > A full-stack AI-powered app helping immigrants navigate working in Thailand across blue-collar, white-collar, and digital nomad paths.
 
 ---
@@ -33,7 +33,7 @@ An intelligent, empathetic immigration companion that meets users where they are
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui
 - **State Management**: Zustand (client state) + React Query (server state)
-- **Fonts**: Lora (display) / DM Sans (body) — consistent with Issa Compass brand
+- **Fonts**: Lora (display) / DM Sans (body) — consistent with Wayfarer brand
 
 ### Backend
 - **Framework**: Flask (Python)

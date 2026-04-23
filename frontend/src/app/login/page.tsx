@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
@@ -8,15 +8,15 @@ import { useChatTaskPanelStore } from "@/store/chatTaskPanel";
 import api from "@/lib/api";
 
 const APP_STORAGE_KEYS = [
-  "issa_roadmap",
-  "issa_overview_cache",
-  "issa_docs_count",
-  "issa_active_task",
-  "issa_documents_checklist",
-  "issa_status_demo",
-  "issa_chat_task_panel",
-  "issa_chat_threads",
-  "issa_subtask_progress",
+  "wayfarer_roadmap",
+  "wayfarer_overview_cache",
+  "wayfarer_docs_count",
+  "wayfarer_active_task",
+  "wayfarer_documents_checklist",
+  "wayfarer_status_demo",
+  "wayfarer_chat_task_panel",
+  "wayfarer_chat_threads",
+  "wayfarer_subtask_progress",
 ];
 
 
@@ -270,7 +270,7 @@ function LoginPageInner() {
         <div className="w-full max-w-sm">
           {/* Logo */}
           <div className="text-center mb-8">
-            <h1 className="font-display font-bold text-2xl text-brand-900">Issa Compass</h1>
+            <h1 className="font-display font-bold text-2xl text-brand-900">Wayfarer</h1>
             <p className="text-sm text-gray-500 mt-1">
               {tab === "signin" ? "Sign in to your account" : "Create a new account"}
             </p>

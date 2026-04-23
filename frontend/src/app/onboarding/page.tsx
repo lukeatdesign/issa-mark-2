@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { useOnboardingStore } from "@/store/onboarding";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
@@ -620,9 +620,9 @@ function RegisterModal({ onSuccess }: { onSuccess: (token: string, username: str
 }
 
 const APP_STORAGE_KEYS = [
-  "issa_roadmap", "issa_overview_cache", "issa_docs_count", "issa_active_task",
-  "issa_documents_checklist", "issa_status_demo", "issa_chat_task_panel",
-  "issa_chat_threads", "issa_subtask_progress",
+  "wayfarer_roadmap", "wayfarer_overview_cache", "wayfarer_docs_count", "wayfarer_active_task",
+  "wayfarer_documents_checklist", "wayfarer_status_demo", "wayfarer_chat_task_panel",
+  "wayfarer_chat_threads", "wayfarer_subtask_progress",
 ];
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -744,7 +744,7 @@ export default function OnboardingPage() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white flex-shrink-0">
-          <span className="font-display font-bold text-base text-brand-900">Issa Compass</span>
+          <span className="font-display font-bold text-base text-brand-900">Wayfarer</span>
           {currentStep === 0 ? (
             <button type="button" onClick={handleExitOnboarding}
               className="text-xs text-gray-600 hover:text-gray-900 transition-colors font-medium">

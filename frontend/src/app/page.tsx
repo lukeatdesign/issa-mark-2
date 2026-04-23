@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 const PERSONAS = [
   {
@@ -27,7 +27,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
         <span className="font-display font-bold text-lg text-brand-900">
-          Issa Compass
+          Wayfarer
         </span>
         <div className="flex items-center gap-2">
           <Link
@@ -56,7 +56,7 @@ export default function LandingPage() {
         <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
           Whether you&apos;re a factory worker from Myanmar, a software engineer
           evaluating a Bangkok offer, or a freelancer exploring the LTR visa —
-          Issa Compass meets you where you are.
+          Wayfarer meets you where you are.
         </p>
         <Link
           href="/onboarding"
@@ -90,7 +90,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 px-6 py-6 text-center text-xs text-gray-400">
-        Issa Compass — Not legal advice. Always consult a licensed Thai immigration lawyer for complex situations.
+        Wayfarer — Not legal advice. Always consult a licensed Thai immigration lawyer for complex situations.
       </footer>
     </div>
   );

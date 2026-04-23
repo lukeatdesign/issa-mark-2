@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,11 +38,11 @@ const DOCS: Doc[] = [
   },
 ];
 
-const DOCS_STORAGE_KEY = "issa_documents_checklist";
+const DOCS_STORAGE_KEY = "wayfarer_documents_checklist";
 
 function markDocsTaskDoneInLocalStorage() {
   try {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (!raw) return;
     const data = JSON.parse(raw);
     let mutated = false;
@@ -61,7 +61,7 @@ function markDocsTaskDoneInLocalStorage() {
     data.employerTasks = markDone(data.employerTasks ?? []);
 
     if (mutated) {
-      localStorage.setItem("issa_roadmap", JSON.stringify(data));
+      localStorage.setItem("wayfarer_roadmap", JSON.stringify(data));
     }
   } catch {
     // corrupted localStorage — ignore
@@ -82,7 +82,7 @@ export default function DocumentsPage() {
   const pct = Math.round((readyCount / DOCS.length) * 100);
 
   useEffect(() => {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (!raw) {
       setShowEmpty(true);
       setIsReady(true);
@@ -156,7 +156,7 @@ export default function DocumentsPage() {
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
           Your document checklist is tied to your roadmap. After Compass generates your plan,
           you&apos;ll see exactly what to gather (for example passport copy, photos, degree) with
-          notes, a progress bar, and a way to send everything to Issa when you&apos;re ready.
+          notes, a progress bar, and a way to send everything to Wayfarer when you&apos;re ready.
         </p>
         <div className="rounded-2xl border border-gray-100 bg-white p-5 mb-8">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
@@ -295,7 +295,7 @@ export default function DocumentsPage() {
           onClick={() => router.push("/dashboard/handoff")}
           className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl transition-colors"
         >
-          Send to Issa →
+          Send to Wayfarer →
         </button>
       )}
     </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { AcademicCapIcon } from "@heroicons/react/24/outline";
@@ -313,7 +313,7 @@ export default function ConsultantDrawer({ open, onClose, messages }: Props) {
                     ref={textareaRef}
                     value={consultantReply}
                     onChange={(e) => setConsultantReply(e.target.value)}
-                    placeholder="How would a real Issa consultant respond to this message?"
+                    placeholder="How would a real Wayfarer consultant respond to this message?"
                     rows={5}
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none leading-relaxed"
                   />

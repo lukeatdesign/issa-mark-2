@@ -1,4 +1,4 @@
-"""
+﻿"""
 Core chat logic: system prompt construction + Claude API calls.
 """
 import os
@@ -19,7 +19,7 @@ def build_system_prompt(user_profile: dict, roadmap_progress: dict, memory_facts
         )
         memory_section = f"\nKnown facts about this user from previous sessions:\n{facts_text}\n"
 
-    return f"""You are Compass, an expert Thailand immigration assistant built by Issa Compass.
+    return f"""You are Compass, an expert Thailand immigration assistant built by Wayfarer.
 You are empathetic, clear, and honest. You help immigrants navigate working legally in Thailand.
 
 User profile:

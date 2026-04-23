@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -93,7 +93,7 @@ export default function ClientSidebar() {
             href="/"
             className="font-display font-bold text-brand-900 text-base whitespace-nowrap"
           >
-            {isExpanded ? "Issa Compass" : "IC"}
+            {isExpanded ? "Wayfarer" : "W"}
           </Link>
         </div>
 

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * Persists per-step checkbox state for roadmap tasks (Chat panel + My Roadmap).
  * Key: user:taskId | employer:taskId | title:<normalized title>
  */
 
-const STORAGE_KEY = "issa_subtask_progress";
+const STORAGE_KEY = "wayfarer_subtask_progress";
 
 type PersistShape = {
   v: 1;

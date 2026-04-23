@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ChatMessage, ChatActiveTask } from "@/types";
 
@@ -153,7 +153,7 @@ export const useChatStore = create<ChatState>()(
         }),
     }),
     {
-      name: "issa_chat_threads",
+      name: "wayfarer_chat_threads",
       partialize: (s) => ({
         threads: s.threads,
         activeThreadId: s.activeThreadId,

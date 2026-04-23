@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface AuthState {
@@ -28,6 +28,6 @@ export const useAuthStore = create<AuthState>()(
           isLoggedIn: false,
         })),
     }),
-    { name: "issa_auth" }
+    { name: "wayfarer_auth" }
   )
 );

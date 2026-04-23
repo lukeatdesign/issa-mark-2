@@ -1,4 +1,4 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { QuizAnswers } from "@/types";
 
@@ -50,7 +50,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       reset: () => set({ currentStep: 0, answers: {} }),
     }),
     {
-      name: "issa_onboarding",
+      name: "wayfarer_onboarding",
       // totalSteps must not be persisted — it changes when questions are added/removed
       partialize: (state) => ({ currentStep: state.currentStep, answers: state.answers }),
     }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MapIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -46,7 +46,7 @@ function SummaryCard({
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("issa_overview_cache");
+      const raw = localStorage.getItem("wayfarer_overview_cache");
       if (raw) {
         const cache: OverviewCache = JSON.parse(raw);
         if (cache.tasksDone === tasksDone && cache.docsUploaded === docsUploaded) {
@@ -74,7 +74,7 @@ function SummaryCard({
         setSummary(text);
         try {
           localStorage.setItem(
-            "issa_overview_cache",
+            "wayfarer_overview_cache",
             JSON.stringify({ summary: text, tasksDone, docsUploaded })
           );
         } catch { /* storage full — ignore */ }
@@ -179,7 +179,7 @@ function NextActions({
                     )}
                     {task.canAutomate && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 text-violet-500 flex-shrink-0">
-                        Issa can help
+                        Wayfarer can help
                       </span>
                     )}
                   </div>
@@ -407,12 +407,12 @@ export default function OverviewPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("issa_roadmap");
+      const raw = localStorage.getItem("wayfarer_roadmap");
       if (raw) setRoadmap(JSON.parse(raw));
     } catch { /* corrupted — treat as empty */ }
 
     try {
-      const raw = localStorage.getItem("issa_onboarding");
+      const raw = localStorage.getItem("wayfarer_onboarding");
       if (raw) {
         const parsed = JSON.parse(raw);
         const name = parsed?.state?.answers?.name;
@@ -421,7 +421,7 @@ export default function OverviewPage() {
     } catch { /* ignore */ }
 
     try {
-      const raw = localStorage.getItem("issa_documents_checklist");
+      const raw = localStorage.getItem("wayfarer_documents_checklist");
       if (raw) {
         const parsed = JSON.parse(raw) as { ready?: Record<string, boolean> };
         if (parsed.ready) {

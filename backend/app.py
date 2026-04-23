@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -29,7 +29,7 @@ def supabase_headers():
     }
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You are Compass, an expert Thailand immigration assistant built by Issa Compass. "
+    "You are Compass, an expert Thailand immigration assistant built by Wayfarer. "
     "You are empathetic, clear, and honest. You help immigrants navigate working legally in Thailand. "
     "When answering procedural questions, cite the relevant Thai law or regulation where possible. "
     "Never fabricate visa rules or processing times — if uncertain, say so and direct the user to "
@@ -60,7 +60,7 @@ def save_prompt(new_prompt):
 
 @app.route('/')
 def hello():
-    return 'Issa Compass AI Server is running!'
+    return 'Wayfarer AI Server is running!'
 
 @app.route('/get-prompt', methods=['GET'])
 def get_current_prompt():
@@ -277,8 +277,8 @@ Field definitions:
 - status: "available" (can start now), "blocked" (waiting on something else first — name it in blockedBy), "in_progress" (already underway)
 - priority: "urgent" (must complete in first 2 weeks), "high" (weeks 2-4), "normal" (can wait)
 - subtasks: 2-4 concrete numbered steps the person must take to complete this task
-- canAutomate: true if a service or the Issa app can handle this step for the user
-- automationHint: short string like "Issa handles this" or "Upload doc in app" if canAutomate is true, else null
+- canAutomate: true if a service or the Wayfarer app can handle this step for the user
+- automationHint: short string like "Wayfarer handles this" or "Upload doc in app" if canAutomate is true, else null
 - blockedBy: short string naming what must come first, e.g. "Employer documents" — only set if status is "blocked"
 - done: always false initially
 

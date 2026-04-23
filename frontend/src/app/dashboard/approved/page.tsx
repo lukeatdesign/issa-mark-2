@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -9,11 +9,11 @@ export default function ApprovedPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("issa_roadmap");
+      const raw = localStorage.getItem("wayfarer_roadmap");
       if (raw) setUserName(JSON.parse(raw)?.userName ?? null);
     } catch { /* corrupted — ignore */ }
     try {
-      const key = "issa_status_demo";
+      const key = "wayfarer_status_demo";
       const cur = JSON.parse(localStorage.getItem(key) || "{}") as {
         demoStage?: number;
         reachedApproved?: boolean;
@@ -75,7 +75,7 @@ export default function ApprovedPage() {
       <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 mt-6 w-full">
         <p className="text-sm text-amber-900 leading-relaxed italic">
           From a job offer in Phnom Penh to working legally in Bangkok — every document,
-          every step, every question answered. You did it, {userName ?? "there"}. Issa was with you
+          every step, every question answered. You did it, {userName ?? "there"}. Wayfarer was with you
           the whole way.
         </p>
       </div>

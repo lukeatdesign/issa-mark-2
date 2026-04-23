@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useRouter } from "next/navigation";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
 
@@ -31,7 +31,7 @@ export default function HandoffPage() {
 
       {/* Subtitle */}
       <p className="text-gray-500 mt-3 max-w-sm mx-auto leading-relaxed">
-        Your documents are with Issa&apos;s team. We take it from here — like ordering a Grab.
+        Your documents are with Wayfarer&apos;s team. We take it from here — like ordering a Grab.
       </p>
 
       {/* Checkpoints */}
@@ -67,7 +67,7 @@ export default function HandoffPage() {
           ))}
         </div>
         <p className="text-sm text-gray-500 mt-3">
-          Danaya and the Issa team are on it
+          Danaya and the Wayfarer team are on it
         </p>
       </div>
 

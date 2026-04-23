@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ function shouldOfferUploadDocumentsCTA(task: RoadmapTask): boolean {
 
   if (!task.canAutomate || !task.automationHint?.trim()) return false;
   const hint = String(task.automationHint).toLowerCase();
-  if (/upload|document|passport|file|in app|issa app/.test(hint)) return true;
+  if (/upload|document|passport|file|in app|wayfarer app/.test(hint)) return true;
   return false;
 }
 
@@ -443,7 +443,7 @@ export default function RoadmapCard({ data }: { data: RoadmapData }) {
 
   const handleHelp = (task: RoadmapTask, taskSection: "user" | "employer") => {
     localStorage.setItem(
-      "issa_active_task",
+      "wayfarer_active_task",
       JSON.stringify({
         roadmapTaskId: task.id,
         taskSection,

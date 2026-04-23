@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import RoadmapCard from "@/components/RoadmapCard";
@@ -9,7 +9,7 @@ export default function RoadmapPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (raw) {
       try {
         setRoadmap(JSON.parse(raw));

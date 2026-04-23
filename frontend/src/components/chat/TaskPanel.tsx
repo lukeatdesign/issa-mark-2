@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import type { ChatMessage, ChatActiveTask } from "@/types";
@@ -76,7 +76,7 @@ function userTextSuggestsSubtask(userBlob: string, subtask: string): boolean {
 
 function markTaskDoneByName(taskName: string) {
   try {
-    const raw = localStorage.getItem("issa_roadmap");
+    const raw = localStorage.getItem("wayfarer_roadmap");
     if (!raw) return;
     const data = JSON.parse(raw);
     let mutated = false;
@@ -89,7 +89,7 @@ function markTaskDoneByName(taskName: string) {
     };
     data.userTasks = (data.userTasks ?? []).map(markDone);
     data.employerTasks = (data.employerTasks ?? []).map(markDone);
-    if (mutated) localStorage.setItem("issa_roadmap", JSON.stringify(data));
+    if (mutated) localStorage.setItem("wayfarer_roadmap", JSON.stringify(data));
   } catch { /* corrupted — ignore */ }
 }
 
@@ -144,7 +144,7 @@ export default function TaskPanel({
     // Re-hydrate from localStorage so "Mark as done" survives navigation
     if (!task) return false;
     try {
-      const raw = localStorage.getItem("issa_roadmap");
+      const raw = localStorage.getItem("wayfarer_roadmap");
       if (!raw) return false;
       const data = JSON.parse(raw);
       const allTasks: Array<{ task: string; done: boolean }> = [
@@ -442,7 +442,7 @@ export default function TaskPanel({
           {task.canAutomate && task.automationHint && (
             <div className="mx-4 mt-3 flex-shrink-0 bg-violet-50 border border-violet-100 rounded-lg px-3 py-2 flex items-start justify-between gap-3">
               <p className="text-xs text-violet-700 flex-1 min-w-0">💡 {task.automationHint}</p>
-              {/\b(upload|document|passport|file|in app|issa app)\b/i.test(task.automationHint) && (
+              {/\b(upload|document|passport|file|in app|wayfarer app)\b/i.test(task.automationHint) && (
                 <Link
                   href="/dashboard/documents"
                   className="text-xs font-semibold text-violet-800 hover:text-violet-950 underline underline-offset-2 shrink-0"

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import RoleGuard from "@/components/shared/RoleGuard";
@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <aside className="w-56 flex-shrink-0 bg-white border-r border-gray-100 flex flex-col">
           <div className="px-5 py-5 border-b border-gray-100">
             <Link href="/" className="font-display font-bold text-brand-900 text-base">
-              Issa Compass
+              Wayfarer
             </Link>
             <p className="text-xs text-gray-400 mt-0.5">Consultant Panel</p>
           </div>

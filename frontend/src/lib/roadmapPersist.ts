@@ -1,6 +1,6 @@
-import type { RoadmapData } from "@/lib/api";
+﻿import type { RoadmapData } from "@/lib/api";
 
-const STORAGE_KEY = "issa_roadmap";
+const STORAGE_KEY = "wayfarer_roadmap";
 
 /** Merge checkbox state into roadmap tasks and save to localStorage. */
 export function persistRoadmapTaskCompletion(

@@ -1,5 +1,5 @@
-// ============================================================
-// Shared TypeScript types — Issa Compass
+﻿// ============================================================
+// Shared TypeScript types — Wayfarer
 // ============================================================
 
 export type UserRole = "user" | "consultant" | "admin";
