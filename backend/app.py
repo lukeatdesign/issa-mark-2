@@ -12,14 +12,28 @@ load_dotenv(override=True)
 
 app = Flask(__name__)
 from flask_cors import CORS
-CORS(app, origins=[
-    "http://localhost:3000",
-    "https://issa-mark-2.vercel.app"
-])
+
+
+def get_cors_origins():
+    origins = [
+        "http://localhost:3000",
+        "https://issa-mark-2.vercel.app",
+        "https://wayfarer-luke.vercel.app",
+    ]
+    extra_origins = os.getenv("CORS_ORIGINS", "")
+    for origin in extra_origins.split(","):
+        normalized = origin.strip()
+        if normalized and normalized not in origins:
+            origins.append(normalized)
+    return origins
+
+
+CORS(app, origins=get_cors_origins())
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_TIMEOUT_SECONDS = 10
 
 def supabase_headers():
     return {
@@ -27,6 +41,52 @@ def supabase_headers():
         "Authorization": f"Bearer {SUPABASE_KEY}",
         "Content-Type": "application/json"
     }
+
+
+def supabase_rest_url(path):
+    return f"{SUPABASE_URL}/rest/v1/{path.lstrip('/')}"
+
+
+def supabase_request(method, path, *, json_body=None, timeout=SUPABASE_TIMEOUT_SECONDS):
+    return requests.request(
+        method,
+        supabase_rest_url(path),
+        headers=supabase_headers(),
+        json=json_body,
+        timeout=timeout,
+    )
+
+
+def supabase_error_message(operation, response, *, expected_table=None):
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+
+    if (
+        expected_table
+        and response.status_code == 404
+        and isinstance(payload, dict)
+        and payload.get("code") == "PGRST205"
+    ):
+        return (
+            f"{operation} is unavailable because Supabase table '{expected_table}' is missing. "
+            "Apply the latest Supabase migrations for this project.",
+            503,
+        )
+
+    detail = None
+    if isinstance(payload, dict):
+        detail = payload.get("message") or payload.get("hint")
+        if not detail:
+            detail = json.dumps(payload)
+    if not detail:
+        detail = (response.text or "Unknown Supabase error").strip()
+
+    return (
+        f"{operation} failed. Supabase returned {response.status_code}: {detail[:200]}",
+        502,
+    )
 
 DEFAULT_SYSTEM_PROMPT = (
     "You are Compass, an expert Thailand immigration assistant built by Wayfarer. "
@@ -39,11 +99,7 @@ DEFAULT_SYSTEM_PROMPT = (
 
 def get_prompt():
     try:
-        response = requests.get(
-            f"{SUPABASE_URL}/rest/v1/ai_prompts?order=id.desc&limit=1",
-            headers=supabase_headers(),
-            timeout=5,
-        )
+        response = supabase_request("GET", "ai_prompts?order=id.desc&limit=1", timeout=5)
         data = response.json()
         if isinstance(data, list) and data:
             return data[0]["prompt"]
@@ -52,11 +108,7 @@ def get_prompt():
     return DEFAULT_SYSTEM_PROMPT
 
 def save_prompt(new_prompt):
-    requests.post(
-        f"{SUPABASE_URL}/rest/v1/ai_prompts",
-        headers=supabase_headers(),
-        json={"prompt": new_prompt}
-    )
+    supabase_request("POST", "ai_prompts", json_body={"prompt": new_prompt})
 
 @app.route('/')
 def hello():
@@ -407,38 +459,62 @@ def register():
             return jsonify({'error': 'Password must be at least 6 characters'}), 400
 
         # Check for existing username
-        check = requests.get(
-            f"{SUPABASE_URL}/rest/v1/mock_users?username=eq.{username}&select=username",
-            headers=supabase_headers(),
+        check = supabase_request(
+            "GET",
+            f"mock_users?username=eq.{username}&select=username",
         )
         print(f"[register] duplicate check status={check.status_code} body={check.text[:200]}")
+        if not check.ok:
+            error, status = supabase_error_message(
+                "Registration",
+                check,
+                expected_table="mock_users",
+            )
+            return jsonify({'error': error}), status
         if check.ok and check.json():
             return jsonify({'error': 'Username already taken'}), 409
 
         # Create user
         password_hash = generate_password_hash(password)
-        create = requests.post(
-            f"{SUPABASE_URL}/rest/v1/mock_users",
-            headers=supabase_headers(),
-            json={'username': username, 'password_hash': password_hash},
+        create = supabase_request(
+            "POST",
+            "mock_users",
+            json_body={'username': username, 'password_hash': password_hash},
         )
         print(f"[register] create user status={create.status_code} body={create.text[:200]}")
+        if create.status_code == 409:
+            return jsonify({'error': 'Username already taken'}), 409
         if not create.ok:
-            return jsonify({'error': f'Could not create user: {create.text}'}), 500
+            error, status = supabase_error_message(
+                "Registration",
+                create,
+                expected_table="mock_users",
+            )
+            return jsonify({'error': error}), status
 
         # Create session
         token = str(uuid.uuid4())
-        sess = requests.post(
-            f"{SUPABASE_URL}/rest/v1/mock_sessions",
-            headers=supabase_headers(),
-            json={'token': token, 'username': username},
+        sess = supabase_request(
+            "POST",
+            "mock_sessions",
+            json_body={'token': token, 'username': username},
         )
         print(f"[register] create session status={sess.status_code} body={sess.text[:200]}")
         if not sess.ok:
-            return jsonify({'error': f'Could not create session: {sess.text}'}), 500
+            error, status = supabase_error_message(
+                "Registration",
+                sess,
+                expected_table="mock_sessions",
+            )
+            return jsonify({'error': error}), status
 
         return jsonify({'token': token, 'username': username}), 201
 
+    except requests.RequestException:
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Registration is temporarily unavailable because the server could not reach Supabase.'
+        }), 503
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
@@ -446,35 +522,60 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json or {}
-    username = (data.get('username') or '').strip().lower()
-    password = data.get('password') or ''
+    try:
+        data = request.json or {}
+        username = (data.get('username') or '').strip().lower()
+        password = data.get('password') or ''
 
-    if not username or not password:
-        return jsonify({'error': 'Username and password required'}), 400
+        if not username or not password:
+            return jsonify({'error': 'Username and password required'}), 400
 
-    resp = requests.get(
-        f"{SUPABASE_URL}/rest/v1/mock_users?username=eq.{username}&select=username,password_hash",
-        headers=supabase_headers(),
-    )
-    print(f"[login] Supabase status={resp.status_code} body={resp.text[:200]}")
-    users = resp.json() if resp.ok else []
-    if not users:
-        print(f"[login] No user found for username='{username}'")
-        return jsonify({'error': 'Invalid credentials'}), 401
+        resp = supabase_request(
+            "GET",
+            f"mock_users?username=eq.{username}&select=username,password_hash",
+        )
+        print(f"[login] Supabase status={resp.status_code} body={resp.text[:200]}")
+        if not resp.ok:
+            error, status = supabase_error_message(
+                "Login",
+                resp,
+                expected_table="mock_users",
+            )
+            return jsonify({'error': error}), status
 
-    if not check_password_hash(users[0]['password_hash'], password):
-        print(f"[login] Password mismatch for username='{username}'")
-        return jsonify({'error': 'Invalid credentials'}), 401
+        users = resp.json()
+        if not users:
+            print(f"[login] No user found for username='{username}'")
+            return jsonify({'error': 'Invalid credentials'}), 401
 
-    token = str(uuid.uuid4())
-    requests.post(
-        f"{SUPABASE_URL}/rest/v1/mock_sessions",
-        headers=supabase_headers(),
-        json={'token': token, 'username': username},
-    )
+        if not check_password_hash(users[0]['password_hash'], password):
+            print(f"[login] Password mismatch for username='{username}'")
+            return jsonify({'error': 'Invalid credentials'}), 401
 
-    return jsonify({'token': token, 'username': username})
+        token = str(uuid.uuid4())
+        session_resp = supabase_request(
+            "POST",
+            "mock_sessions",
+            json_body={'token': token, 'username': username},
+        )
+        if not session_resp.ok:
+            error, status = supabase_error_message(
+                "Login",
+                session_resp,
+                expected_table="mock_sessions",
+            )
+            return jsonify({'error': error}), status
+
+        return jsonify({'token': token, 'username': username})
+
+    except requests.RequestException:
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Login is temporarily unavailable because the server could not reach Supabase.'
+        }), 503
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/logout', methods=['POST'])
@@ -482,10 +583,15 @@ def logout():
     auth = request.headers.get('Authorization', '')
     if auth.startswith('Bearer '):
         token = auth.split(' ', 1)[1]
-        requests.delete(
-            f"{SUPABASE_URL}/rest/v1/mock_sessions?token=eq.{token}",
-            headers=supabase_headers(),
-        )
+        try:
+            resp = supabase_request(
+                "DELETE",
+                f"mock_sessions?token=eq.{token}",
+            )
+            if not resp.ok:
+                print(f"[logout] Supabase status={resp.status_code} body={resp.text[:200]}")
+        except requests.RequestException as e:
+            print(f"[logout] Supabase request failed: {e}")
     return jsonify({'ok': True})
 
 

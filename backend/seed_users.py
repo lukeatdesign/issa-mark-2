@@ -1,19 +1,8 @@
 """
 Seed 10 mock user accounts into Supabase.
 
-Run ONCE after creating the tables in Supabase SQL Editor:
-
-    CREATE TABLE IF NOT EXISTS mock_users (
-        username      TEXT PRIMARY KEY,
-        password_hash TEXT NOT NULL,
-        created_at    TIMESTAMPTZ DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS mock_sessions (
-        token      TEXT PRIMARY KEY,
-        username   TEXT NOT NULL REFERENCES mock_users(username) ON DELETE CASCADE,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-    );
+Run after applying the Supabase migrations in `supabase/migrations/`,
+including `002_mock_auth_tables.sql`.
 
 Then run:
     cd backend
